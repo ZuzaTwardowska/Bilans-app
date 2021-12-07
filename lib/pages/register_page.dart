@@ -1,4 +1,10 @@
+import 'package:bilans/models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'home_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -10,17 +16,20 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final firstNameEditingController = TextEditingController();
-  final secondNameEditingController = TextEditingController();
+  final nameEditingController = TextEditingController();
+  final surnameEditingController = TextEditingController();
   final emailEditingController = TextEditingController();
   final passwordEditingController = TextEditingController();
   final confirmPasswordEditingController = TextEditingController();
 
+  final _auth = FirebaseAuth.instance;
+  String? errorMessage;
+
   @override
   Widget build(BuildContext context) {
-    final firstNameField = TextFormField(
+    final nameField = TextFormField(
       autofocus: false,
-      controller: firstNameEditingController,
+      controller: nameEditingController,
       keyboardType: TextInputType.name,
       validator: (value) {
         RegExp regex = RegExp(r'^.{3,}$');
@@ -33,7 +42,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return null;
       },
       onSaved: (value) {
-        firstNameEditingController.text = value!;
+        nameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -46,9 +55,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
     );
 
-    final secondNameField = TextFormField(
+    final surnameField = TextFormField(
       autofocus: false,
-      controller: secondNameEditingController,
+      controller: surnameEditingController,
       keyboardType: TextInputType.name,
       validator: (value) {
         if (value!.isEmpty) {
@@ -57,7 +66,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return null;
       },
       onSaved: (value) {
-        secondNameEditingController.text = value!;
+        surnameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -84,7 +93,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         return null;
       },
       onSaved: (value) {
-        firstNameEditingController.text = value!;
+        nameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -111,7 +120,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         }
       },
       onSaved: (value) {
-        firstNameEditingController.text = value!;
+        nameEditingController.text = value!;
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
@@ -156,7 +165,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
+        onPressed: () {
+          register(emailEditingController.text, passwordEditingController.text);
+        },
         child: const Text(
           "SignUp",
           textAlign: TextAlign.center,
@@ -189,9 +200,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     const SizedBox(height: 45),
-                    firstNameField,
+                    nameField,
                     const SizedBox(height: 20),
-                    secondNameField,
+                    surnameField,
                     const SizedBox(height: 20),
                     emailField,
                     const SizedBox(height: 20),
@@ -209,5 +220,63 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
     );
+  }
+
+  void register(String email, String password) async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await _auth
+            .createUserWithEmailAndPassword(email: email, password: password)
+            .then((value) => {postDetailsToFirestore()})
+            .catchError((e) {
+          Fluttertoast.showToast(msg: e!.message);
+        });
+      } on FirebaseAuthException catch (error) {
+        switch (error.code) {
+          case "invalid-email":
+            errorMessage = "Your email address appears to be malformed.";
+            break;
+          case "wrong-password":
+            errorMessage = "Your password is wrong.";
+            break;
+          case "user-not-found":
+            errorMessage = "User with this email doesn't exist.";
+            break;
+          case "user-disabled":
+            errorMessage = "User with this email has been disabled.";
+            break;
+          case "too-many-requests":
+            errorMessage = "Too many requests";
+            break;
+          case "operation-not-allowed":
+            errorMessage = "Signing in with Email and Password is not enabled.";
+            break;
+          default:
+            errorMessage = "An undefined Error happened.";
+        }
+        Fluttertoast.showToast(msg: errorMessage!);
+      }
+    }
+  }
+
+  postDetailsToFirestore() async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User? user = _auth.currentUser;
+
+    UserModel userModel = UserModel();
+
+    userModel.email = user!.email;
+    userModel.uid = user.uid;
+    userModel.name = nameEditingController.text;
+    userModel.surname = surnameEditingController.text;
+
+    await firebaseFirestore
+        .collection("users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Account created successfully :) ");
+
+    Navigator.pushAndRemoveUntil((context),
+        MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
   }
 }

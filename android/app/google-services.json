@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "242975554190",
+    "project_id": "bilans-78c36",
+    "storage_bucket": "bilans-78c36.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:242975554190:android:d23047b0000d412719a7df",
+        "android_client_info": {
+          "package_name": "com.example.bilans"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "242975554190-p1ctb90974oc3paqt44uoe9clrvl51fj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4OJE5w-yEegegppCEckYcEoJGrZqOZmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "242975554190-p1ctb90974oc3paqt44uoe9clrvl51fj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
