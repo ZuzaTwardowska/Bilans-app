@@ -140,7 +140,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       validator: (value) {
         if (confirmPasswordEditingController.text !=
             passwordEditingController.text) {
-          return "Password don't match";
+          return "Passwords don't match";
         }
         return null;
       },

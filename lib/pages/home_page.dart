@@ -30,43 +30,170 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final expenseButton = Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(30),
+      color: Colors.redAccent,
+      child: MaterialButton(
+        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () {},
+        child: const Text(
+          "Add Expense",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
+    final incomeButton = Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(30),
+      color: Colors.redAccent,
+      child: MaterialButton(
+        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () {},
+        child: const Text(
+          "Add Income",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
+    final categoryButton = Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(30),
+      color: Colors.redAccent,
+      child: MaterialButton(
+        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () {},
+        child: const Text(
+          "Add Category",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
+    final tableButton = Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(30),
+      color: Colors.redAccent,
+      child: MaterialButton(
+        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () {},
+        child: const Text(
+          "View Table",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
+    final logoutButton = Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(30),
+      color: Colors.redAccent,
+      child: MaterialButton(
+        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+        minWidth: MediaQuery.of(context).size.width,
+        onPressed: () {
+          logout(context);
+        },
+        child: const Text(
+          "Logout",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Welcome"),
+        title: const Text("Bilans"),
         centerTitle: true,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Expanded(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const Text(
-                "Welcome Back",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.redAccent, width: 1.5),
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(5.0),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: <Widget>[
+                      Column(
+                        children: [
+                          const Text(
+                            "Logged as:",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Column(children: [
+                          Text("${loggedInUser.name} ${loggedInUser.surname}",
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w500,
+                              )),
+                          Text(
+                            "${loggedInUser.email}",
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(
-                height: 10,
+                height: 40,
               ),
-              Text("${loggedInUser.name} ${loggedInUser.surname}",
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w500,
-                  )),
-              Text("${loggedInUser.email}",
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w500,
-                  )),
-              const SizedBox(
-                height: 15,
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    expenseButton,
+                    const SizedBox(
+                      height: 22,
+                    ),
+                    incomeButton,
+                    const SizedBox(
+                      height: 22,
+                    ),
+                    categoryButton,
+                    const SizedBox(
+                      height: 22,
+                    ),
+                    tableButton,
+                    const SizedBox(
+                      height: 22,
+                    ),
+                    logoutButton
+                  ],
+                ),
               ),
-              ActionChip(
-                  label: const Text("Logout"),
-                  onPressed: () {
-                    logout(context);
-                  }),
             ],
           ),
         ),
