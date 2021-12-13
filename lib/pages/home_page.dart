@@ -127,44 +127,40 @@ class _HomePageState extends State<HomePage> {
         child: Expanded(
           child: Column(
             children: <Widget>[
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.redAccent, width: 1.5),
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(5.0),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    children: <Widget>[
-                      Column(
-                        children: [
-                          const Text(
-                            "Logged as:",
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: <Widget>[
+                    Column(
+                      children: [
+                        const Text(
+                          "Logged as:",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: Column(children: [
+                        Text(
+                          "${loggedInUser.name} ${loggedInUser.surname}",
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
-                      ),
-                      Expanded(
-                        child: Column(children: [
-                          Text("${loggedInUser.name} ${loggedInUser.surname}",
-                              style: const TextStyle(
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w500,
-                              )),
-                          Text(
-                            "${loggedInUser.email}",
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          textAlign: TextAlign.right,
+                        ),
+                        Text(
+                          "${loggedInUser.email}",
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ]),
-                      ),
-                    ],
-                  ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ]),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(
