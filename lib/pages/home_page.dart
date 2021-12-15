@@ -2,6 +2,7 @@ import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'add_category_page.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -71,7 +72,10 @@ class _HomePageState extends State<HomePage> {
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AddCategoryPage()));
+        },
         child: const Text(
           "Add Category",
           textAlign: TextAlign.center,
