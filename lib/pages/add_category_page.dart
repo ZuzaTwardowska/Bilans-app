@@ -1,4 +1,3 @@
-import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
