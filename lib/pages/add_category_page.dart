@@ -18,9 +18,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   final _formKey = GlobalKey<FormState>();
   final nameEditingController = TextEditingController();
   final descriptionEditingController = TextEditingController();
-  String? _currentSelectedValue;
-
-  final _auth = FirebaseAuth.instance;
+  String? selectedType;
   String? errorMessage;
 
   @override
@@ -101,15 +99,15 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
               borderRadius: BorderRadius.circular(5.0),
             ),
           ),
-          isEmpty: _currentSelectedValue == '',
+          isEmpty: selectedType == '',
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: _currentSelectedValue,
+              value: selectedType,
               isDense: true,
               onChanged: (String? newValue) {
                 setState(
                   () {
-                    _currentSelectedValue = newValue!;
+                    selectedType = newValue!;
                     state.didChange(newValue);
                   },
                 );
@@ -135,17 +133,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          if (_currentSelectedValue == null) return;
-          categories
-              .add({
-                'name': nameEditingController.text,
-                'description': descriptionEditingController.text,
-                'userId': loggedInUser.uid,
-                'type': _currentSelectedValue,
-                'id': categories.doc().id,
-              })
-              .then((value) => Fluttertoast.showToast(msg: "Category added!"))
-              .catchError((error) => print("Failed to add user: $error"));
+          addCategory(categories);
         },
         child: const Text(
           "Add Category",
@@ -186,5 +174,21 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         ),
       ),
     );
+  }
+
+  void addCategory(CollectionReference categories) async {
+    if (selectedType == null) return;
+    await categories
+        .add({
+          'name': nameEditingController.text,
+          'description': descriptionEditingController.text,
+          'userId': loggedInUser.uid,
+          'type': selectedType,
+          'id': categories.doc().id,
+        })
+        .then((value) => Fluttertoast.showToast(msg: "Category added!"))
+        .catchError(
+            (error) => Fluttertoast.showToast(msg: "Something went wrong..."));
+    Navigator.of(context).pop();
   }
 }
