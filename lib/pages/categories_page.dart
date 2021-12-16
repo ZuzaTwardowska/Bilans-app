@@ -73,7 +73,21 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   children: snapshot.data!.docs.map((doc) {
                     return Card(
                       child: ListTile(
-                        title: Text(CategoryModel.fromMap(doc.data()!).name!),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(CategoryModel.fromMap(doc.data()!).name!),
+                            MaterialButton(
+                              onPressed: () {
+                                doc.reference.delete();
+                              },
+                              child: const Icon(
+                                Icons.remove,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
@@ -107,7 +121,21 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   children: snapshot.data!.docs.map((doc) {
                     return Card(
                       child: ListTile(
-                        title: Text(CategoryModel.fromMap(doc.data()!).name!),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(CategoryModel.fromMap(doc.data()!).name!),
+                            MaterialButton(
+                              onPressed: () {
+                                doc.reference.delete();
+                              },
+                              child: const Icon(
+                                Icons.remove,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
@@ -140,7 +168,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
               const SizedBox(
                 height: 10,
               ),
-              SizedBox(height: 220, child: incomeList),
+              SizedBox(height: 200, child: incomeList),
               const SizedBox(
                 height: 20,
               ),
@@ -152,7 +180,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
               const SizedBox(
                 height: 10,
               ),
-              SizedBox(height: 220, child: expenseList),
+              SizedBox(height: 200, child: expenseList),
               const SizedBox(
                 height: 40,
               ),
