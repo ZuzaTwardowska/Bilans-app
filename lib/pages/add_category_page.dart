@@ -18,7 +18,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   final _formKey = GlobalKey<FormState>();
   final nameEditingController = TextEditingController();
   final descriptionEditingController = TextEditingController();
-  var _currentSelectedValue;
+  String? _currentSelectedValue;
 
   final _auth = FirebaseAuth.instance;
   String? errorMessage;
@@ -38,8 +38,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // CollectionReference categories =
-    //     FirebaseFirestore.instance.collection('categories');
+    CollectionReference categories =
+        FirebaseFirestore.instance.collection('categories');
 
     final nameField = TextFormField(
       autofocus: false,
@@ -135,14 +135,17 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          // categories
-          //     .add({
-          //       'name': nameEditingController.value,
-          //       'description': descriptionEditingController.value,
-          //       'userId': loggedInUser.uid,
-          //     })
-          //     .then((value) => {})
-          //     .catchError((error) => {});
+          if (_currentSelectedValue == null) return;
+          categories
+              .add({
+                'name': nameEditingController.text,
+                'description': descriptionEditingController.text,
+                'userId': loggedInUser.uid,
+                'type': _currentSelectedValue,
+                'id': categories.doc().id,
+              })
+              .then((value) => Fluttertoast.showToast(msg: "Category added!"))
+              .catchError((error) => print("Failed to add user: $error"));
         },
         child: const Text(
           "Add Category",

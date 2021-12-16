@@ -13,6 +13,7 @@ class CategoryModel {
       userId: map['userId'],
       name: map['name'],
       description: map['description'],
+      type: map['type'],
     );
   }
 
@@ -22,6 +23,7 @@ class CategoryModel {
       'userId': userId,
       'name': name,
       'description': description,
+      'type': type,
     };
   }
 }
