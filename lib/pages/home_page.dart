@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'categories_page.dart';
+import 'expenses_page.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -38,9 +39,12 @@ class _HomePageState extends State<HomePage> {
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ExpensesPage()));
+        },
         child: const Text(
-          "Add Expense",
+          "Expenses",
           textAlign: TextAlign.center,
           style: TextStyle(
               fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
