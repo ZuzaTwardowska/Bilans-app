@@ -1,3 +1,4 @@
+import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,166 +17,35 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final nameEditingController = TextEditingController();
-  final surnameEditingController = TextEditingController();
-  final emailEditingController = TextEditingController();
-  final passwordEditingController = TextEditingController();
-  final confirmPasswordEditingController = TextEditingController();
+  final nameController = TextEditingController();
+  final surnameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   final _auth = FirebaseAuth.instance;
   String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
-    final nameField = TextFormField(
-      autofocus: false,
-      controller: nameEditingController,
-      keyboardType: TextInputType.name,
-      validator: (value) {
-        RegExp regex = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ("First Name cannot be Empty");
-        }
-        if (!regex.hasMatch(value)) {
-          return ("Enter Valid name(Min. 3 Character)");
-        }
-        return null;
-      },
-      onSaved: (value) {
-        nameEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.account_circle),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "First Name",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final nameField = FormFieldComponents.regularTextField(
+        nameController, "First Name", true, Icons.account_circle);
 
-    final surnameField = TextFormField(
-      autofocus: false,
-      controller: surnameEditingController,
-      keyboardType: TextInputType.name,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return ("Second Name cannot be Empty");
-        }
-        return null;
-      },
-      onSaved: (value) {
-        surnameEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.account_circle),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Second Name",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final surnameField = FormFieldComponents.regularTextField(
+        surnameController, "Surname", true, Icons.account_circle);
 
-    final emailField = TextFormField(
-      autofocus: false,
-      controller: emailEditingController,
-      keyboardType: TextInputType.emailAddress,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return ("Please Enter Your Email");
-        }
-        if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
-          return ("Please Enter a valid email");
-        }
-        return null;
-      },
-      onSaved: (value) {
-        nameEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.mail),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Email",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final emailField = FormFieldComponents.emailField(emailController);
 
-    final passwordField = TextFormField(
-      autofocus: false,
-      controller: passwordEditingController,
-      obscureText: true,
-      validator: (value) {
-        RegExp regex = RegExp(r'^.{6,}$');
-        if (value!.isEmpty) {
-          return ("Password is required for login");
-        }
-        if (!regex.hasMatch(value)) {
-          return ("Enter Valid Password(Min. 6 Character)");
-        }
-      },
-      onSaved: (value) {
-        nameEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.vpn_key),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Password",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final passwordField = FormFieldComponents.passwordField(
+        passwordController, TextInputAction.next);
 
-    final confirmPasswordField = TextFormField(
-      autofocus: false,
-      controller: confirmPasswordEditingController,
-      obscureText: true,
-      validator: (value) {
-        if (confirmPasswordEditingController.text !=
-            passwordEditingController.text) {
-          return "Passwords don't match";
-        }
-        return null;
-      },
-      onSaved: (value) {
-        confirmPasswordEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.done,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.vpn_key),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Confirm Password",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final confirmPasswordField = FormFieldComponents.confrimPasswordField(
+        confirmPasswordController,
+        passwordController.text,
+        TextInputAction.done);
 
-    final signUpButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          register(emailEditingController.text, passwordEditingController.text);
-        },
-        child: const Text(
-          "SignUp",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    final signUpButton = FormFieldComponents.formSubmitButton(context,
+        "Sign up", [emailController, passwordController].toList(), register);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -199,7 +69,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    const SizedBox(height: 45),
+                    const SizedBox(height: 35),
                     nameField,
                     const SizedBox(height: 20),
                     surnameField,
@@ -209,7 +79,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     passwordField,
                     const SizedBox(height: 20),
                     confirmPasswordField,
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
                     signUpButton,
                     const SizedBox(height: 15),
                   ],
@@ -222,7 +92,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  void register(String email, String password) async {
+  void register(List<TextEditingController> controllers) async {
+    String email = controllers[0].text;
+    String password = controllers[1].text;
     if (_formKey.currentState!.validate()) {
       try {
         await _auth
@@ -267,8 +139,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     userModel.email = user!.email;
     userModel.uid = user.uid;
-    userModel.name = nameEditingController.text;
-    userModel.surname = surnameEditingController.text;
+    userModel.name = nameController.text;
+    userModel.surname = surnameController.text;
 
     await firebaseFirestore
         .collection("users")

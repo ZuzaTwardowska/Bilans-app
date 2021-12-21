@@ -1,3 +1,4 @@
+import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,9 +18,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
   final _formKey = GlobalKey<FormState>();
-  final nameEditingController = TextEditingController();
-  final descriptionEditingController = TextEditingController();
-  final amountEditingController = TextEditingController();
+  final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final amountController = TextEditingController();
   String? selectedCategory;
   String? errorMessage;
 
@@ -43,155 +44,28 @@ class _AddExpensePageState extends State<AddExpensePage> {
     CollectionReference expenses =
         FirebaseFirestore.instance.collection('expenses');
 
-    final nameField = TextFormField(
-      autofocus: false,
-      controller: nameEditingController,
-      keyboardType: TextInputType.name,
-      validator: (value) {
-        RegExp regex = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ("Expense Name cannot be Empty");
-        }
-        if (!regex.hasMatch(value)) {
-          return ("Enter Valid name(Min. 3 Character)");
-        }
-        return null;
-      },
-      onSaved: (value) {
-        nameEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.category_rounded),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Expense Name",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final nameField = FormFieldComponents.regularTextField(
+        nameController, "Expense title", true, Icons.category_rounded);
 
-    final descriptionField = TextFormField(
-      autofocus: false,
-      controller: descriptionEditingController,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        return null;
-      },
-      onSaved: (value) {
-        descriptionEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.description_rounded),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Expense Description",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final descriptionField = FormFieldComponents.regularTextField(
+        descriptionController,
+        "Expense Description",
+        false,
+        Icons.description_rounded);
 
-    final amountField = TextFormField(
-      autofocus: false,
-      controller: amountEditingController,
-      keyboardType: TextInputType.number,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return ("Provide cost");
-        }
-        try {
-          final number = double.parse(value);
-          if (value.contains(',')) return ("Use '.' for decimals.");
-          if (!value.contains('.')) return null;
-          if (value.substring(value.indexOf('.')).length > 2) {
-            return ("Provide valid decimal");
-          }
-          return null;
-        } catch (e) {
-          return ("Provide valid decimal");
-        }
-      },
-      onSaved: (value) {
-        amountEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.attach_money),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Amount\\Cost",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final amountField =
+        FormFieldComponents.amountTextField(amountController, "Cost");
 
-    final categoryField = StreamBuilder<QuerySnapshot>(
-        stream: categories
+    final categoryField = FormFieldComponents.dropdownCategoryListField(
+        categories
             .where("userId", isEqualTo: loggedInUser.uid)
             .where("type", isEqualTo: "Expense Category")
             .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (snapshot.data!.docs.isNotEmpty) {
-            return Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 4,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      hintText: 'Choose category',
-                    ),
-                    isEmpty: selectedCategory == null,
-                    child: DropdownButton(
-                      value: selectedCategory,
-                      isDense: true,
-                      isExpanded: true,
-                      onChanged: (String? newValue) {
-                        setState(
-                          () {
-                            selectedCategory = newValue!;
-                          },
-                        );
-                      },
-                      items: snapshot.data!.docs.map((doc) {
-                        return DropdownMenuItem<String>(
-                          value: CategoryModel.fromMap(doc).id,
-                          child: Text(CategoryModel.fromMap(doc).name!),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return const Text("Please add some categories first.");
-          }
-        });
+        selectedCategory,
+        setCategory);
 
-    final addButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          addExpense(expenses);
-        },
-        child: const Text(
-          "Add Expense",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    final addButton = FormFieldComponents.addNewElement(
+        context, expenses, addExpense, "Add Expense");
 
     return Scaffold(
       appBar: AppBar(
@@ -228,17 +102,15 @@ class _AddExpensePageState extends State<AddExpensePage> {
   }
 
   void addExpense(CollectionReference expenses) async {
-    if (selectedCategory == null ||
-        nameEditingController.text.isEmpty ||
-        amountEditingController.text.isEmpty) {
+    if (selectedCategory == null || !_formKey.currentState!.validate()) {
       Fluttertoast.showToast(msg: "Provide all data!");
       return;
     }
     await expenses
         .add({
-          'name': nameEditingController.text,
-          'description': descriptionEditingController.text,
-          'amount': amountEditingController.text,
+          'name': nameController.text,
+          'description': descriptionController.text,
+          'amount': amountController.text,
           'userId': loggedInUser.uid,
           'categoryId': selectedCategory,
           'id': expenses.doc().id,
@@ -247,5 +119,11 @@ class _AddExpensePageState extends State<AddExpensePage> {
         .catchError(
             (error) => Fluttertoast.showToast(msg: "Something went wrong..."));
     Navigator.of(context).pop();
+  }
+
+  void setCategory(String value) {
+    setState(() {
+      selectedCategory = value;
+    });
   }
 }

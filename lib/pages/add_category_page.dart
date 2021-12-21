@@ -1,3 +1,4 @@
+import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,8 +16,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
   final _formKey = GlobalKey<FormState>();
-  final nameEditingController = TextEditingController();
-  final descriptionEditingController = TextEditingController();
+  final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
   String? selectedType;
   String? errorMessage;
 
@@ -38,54 +39,14 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
     CollectionReference categories =
         FirebaseFirestore.instance.collection('categories');
 
-    final nameField = TextFormField(
-      autofocus: false,
-      controller: nameEditingController,
-      keyboardType: TextInputType.name,
-      validator: (value) {
-        RegExp regex = RegExp(r'^.{3,}$');
-        if (value!.isEmpty) {
-          return ("Category Name cannot be Empty");
-        }
-        if (!regex.hasMatch(value)) {
-          return ("Enter Valid name(Min. 3 Character)");
-        }
-        return null;
-      },
-      onSaved: (value) {
-        nameEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.category_rounded),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Category Name",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final nameField = FormFieldComponents.regularTextField(
+        nameController, "Category Name", true, Icons.category_rounded);
 
-    final descriptionField = TextFormField(
-      autofocus: false,
-      controller: descriptionEditingController,
-      keyboardType: TextInputType.text,
-      validator: (value) {
-        return null;
-      },
-      onSaved: (value) {
-        descriptionEditingController.text = value!;
-      },
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.description_rounded),
-        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Category Description",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
+    final descriptionField = FormFieldComponents.regularTextField(
+        descriptionController,
+        "Category Description",
+        false,
+        Icons.description_rounded);
 
     final typeField = FormField<String>(
       builder: (FormFieldState<String> state) {
@@ -124,24 +85,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
       },
     );
 
-    final addButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          addCategory(categories);
-        },
-        child: const Text(
-          "Add Category",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    final addButton = FormFieldComponents.addNewElement(
+        context, categories, addCategory, "Add Category");
 
     return Scaffold(
       appBar: AppBar(
@@ -177,10 +122,11 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
 
   void addCategory(CollectionReference categories) async {
     if (selectedType == null) return;
+    if (!_formKey.currentState!.validate()) return;
     await categories
         .add({
-          'name': nameEditingController.text,
-          'description': descriptionEditingController.text,
+          'name': nameController.text,
+          'description': descriptionController.text,
           'userId': loggedInUser.uid,
           'type': selectedType,
           'id': categories.doc().id,
