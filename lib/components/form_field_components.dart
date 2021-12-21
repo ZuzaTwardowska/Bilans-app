@@ -1,7 +1,6 @@
 import 'package:bilans/models/category_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'form_validation.dart';
 
 class FormFieldComponents {

@@ -1,7 +1,9 @@
+import 'package:bilans/components/page_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'add_icome_page.dart';
 import 'categories_page.dart';
 import 'expenses_page.dart';
 import 'login_page.dart';
@@ -32,79 +34,25 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final expenseButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ExpensesPage()));
-        },
-        child: const Text(
-          "Expenses",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    final expenseButton = PageComponents.redirectButton(
+        context,
+        MaterialPageRoute(builder: (context) => const ExpensesPage()),
+        "Expenses");
 
-    final incomeButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
-        child: const Text(
-          "Add Income",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    final incomeButton = PageComponents.redirectButton(
+        context,
+        MaterialPageRoute(builder: (context) => const AddIncomePage()),
+        "Income");
 
-    final categoryButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => CategoriesPage()));
-        },
-        child: const Text(
-          "Categories",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    final categoryButton = PageComponents.redirectButton(
+        context,
+        MaterialPageRoute(builder: (context) => const CategoriesPage()),
+        "Categories");
 
-    final tableButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(30),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: () {},
-        child: const Text(
-          "View Table",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
+    final tableButton = PageComponents.redirectButton(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+        "View Table");
 
     final logoutButton = Material(
       elevation: 5,
@@ -125,6 +73,42 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
+    final userInfo = Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Row(
+        children: <Widget>[
+          Column(
+            children: const [
+              Text(
+                "Logged as:",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Column(children: [
+              Text(
+                "${loggedInUser.name} ${loggedInUser.surname}",
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.right,
+              ),
+              Text(
+                "${loggedInUser.email}",
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ]),
+          ),
+        ],
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Bilans"),
@@ -135,42 +119,7 @@ class _HomePageState extends State<HomePage> {
         child: Expanded(
           child: Column(
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  children: <Widget>[
-                    Column(
-                      children: [
-                        const Text(
-                          "Logged as:",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: Column(children: [
-                        Text(
-                          "${loggedInUser.name} ${loggedInUser.surname}",
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.right,
-                        ),
-                        Text(
-                          "${loggedInUser.email}",
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.right,
-                        ),
-                      ]),
-                    ),
-                  ],
-                ),
-              ),
+              userInfo,
               const SizedBox(
                 height: 40,
               ),
