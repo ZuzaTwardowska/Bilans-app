@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class PageComponents {
   static Material redirectButton(
-      BuildContext context, MaterialPageRoute route, String name) {
+      BuildContext context, Function onClickAction, String name) {
     return Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
@@ -11,7 +11,7 @@ class PageComponents {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          Navigator.push(context, route);
+          onClickAction();
         },
         child: Text(
           name,

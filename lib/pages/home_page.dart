@@ -36,22 +36,26 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final expenseButton = PageComponents.redirectButton(
         context,
-        MaterialPageRoute(builder: (context) => const ExpensesPage()),
+        () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ExpensesPage())),
         "Expenses");
 
     final incomeButton = PageComponents.redirectButton(
         context,
-        MaterialPageRoute(builder: (context) => const AddIncomePage()),
+        () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const AddIncomePage())),
         "Income");
 
     final categoryButton = PageComponents.redirectButton(
         context,
-        MaterialPageRoute(builder: (context) => const CategoriesPage()),
+        () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const CategoriesPage())),
         "Categories");
 
     final tableButton = PageComponents.redirectButton(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => const HomePage())),
         "View Table");
 
     final logoutButton = Material(
