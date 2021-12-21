@@ -5,14 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class AddExpensePage extends StatefulWidget {
-  const AddExpensePage({Key? key}) : super(key: key);
+class AddIncomePage extends StatefulWidget {
+  const AddIncomePage({Key? key}) : super(key: key);
 
   @override
-  _AddExpensePageState createState() => _AddExpensePageState();
+  _AddIncomePageState createState() => _AddIncomePageState();
 }
 
-class _AddExpensePageState extends State<AddExpensePage> {
+class _AddIncomePageState extends State<AddIncomePage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
   final _formKey = GlobalKey<FormState>();
@@ -39,15 +39,15 @@ class _AddExpensePageState extends State<AddExpensePage> {
   Widget build(BuildContext context) {
     CollectionReference categories =
         FirebaseFirestore.instance.collection('categories');
-    CollectionReference expenses =
-        FirebaseFirestore.instance.collection('expenses');
+    CollectionReference incomes =
+        FirebaseFirestore.instance.collection('incomes');
 
     final nameField = FormFieldComponents.regularTextField(
-        nameController, "Expense title", true, Icons.category_rounded);
+        nameController, "Income title", true, Icons.category_rounded);
 
     final descriptionField = FormFieldComponents.regularTextField(
         descriptionController,
-        "Expense Description",
+        "Income Description",
         false,
         Icons.description_rounded);
 
@@ -57,13 +57,13 @@ class _AddExpensePageState extends State<AddExpensePage> {
     final categoryField = FormFieldComponents.dropdownCategoryListField(
         categories
             .where("userId", isEqualTo: loggedInUser.uid)
-            .where("type", isEqualTo: "Expense Category")
+            .where("type", isEqualTo: "Income Category")
             .snapshots(),
         selectedCategory,
         setCategory);
 
     final addButton = FormFieldComponents.addNewElement(
-        context, expenses, addExpense, "Add Expense");
+        context, incomes, addIncome, "Add Income");
 
     return Scaffold(
       appBar: AppBar(
@@ -99,21 +99,21 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  void addExpense(CollectionReference expenses) async {
+  void addIncome(CollectionReference incomes) async {
     if (selectedCategory == null || !_formKey.currentState!.validate()) {
       Fluttertoast.showToast(msg: "Provide all data!");
       return;
     }
-    await expenses
+    await incomes
         .add({
           'name': nameController.text,
           'description': descriptionController.text,
           'amount': amountController.text,
           'userId': loggedInUser.uid,
           'categoryId': selectedCategory,
-          'id': expenses.doc().id,
+          'id': incomes.doc().id,
         })
-        .then((value) => Fluttertoast.showToast(msg: "Expense added!"))
+        .then((value) => Fluttertoast.showToast(msg: "Income added!"))
         .catchError(
             (error) => Fluttertoast.showToast(msg: "Something went wrong..."));
     Navigator.of(context).pop();
