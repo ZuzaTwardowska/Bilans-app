@@ -46,9 +46,6 @@ class FormValidator {
       final number = double.parse(value);
       if (value.contains(',')) return ("Use '.' for decimals.");
       if (!value.contains('.')) return null;
-      if (value.substring(value.indexOf('.')).length > 2) {
-        return ("Provide valid decimal");
-      }
       return null;
     } catch (e) {
       return ("Provide valid decimal");

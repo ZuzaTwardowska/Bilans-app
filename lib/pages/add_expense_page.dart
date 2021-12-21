@@ -1,5 +1,6 @@
 import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
+import 'package:bilans/utility/numeric_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +109,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
         .add({
           'name': nameController.text,
           'description': descriptionController.text,
-          'amount': amountController.text,
+          'amount': Numeric.formatPrice(amountController.text),
           'userId': loggedInUser.uid,
           'categoryId': selectedCategory,
           'id': expenses.doc().id,

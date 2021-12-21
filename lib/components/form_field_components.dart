@@ -67,7 +67,6 @@ class FormFieldComponents {
       String name, bool validate, IconData icon) {
     return TextFormField(
       autofocus: false,
-      obscureText: true,
       validator: (value) =>
           FormValidator.isRegularTextFieldValid(value!, name, validate),
       controller: controller,
@@ -87,7 +86,7 @@ class FormFieldComponents {
       TextEditingController controller, String name) {
     return TextFormField(
       autofocus: false,
-      obscureText: true,
+      keyboardType: TextInputType.number,
       validator: (value) => FormValidator.isAmountTextFieldValid(value!),
       controller: controller,
       onSaved: (value) {

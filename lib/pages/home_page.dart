@@ -3,9 +3,9 @@ import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'add_icome_page.dart';
 import 'categories_page.dart';
 import 'expenses_page.dart';
+import 'incomes_page.dart';
 import 'login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -43,8 +43,8 @@ class _HomePageState extends State<HomePage> {
     final incomeButton = PageComponents.redirectButton(
         context,
         () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const AddIncomePage())),
-        "Income");
+            MaterialPageRoute(builder: (context) => const IncomesPage())),
+        "Incomes");
 
     final categoryButton = PageComponents.redirectButton(
         context,
