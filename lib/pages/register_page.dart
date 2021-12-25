@@ -28,13 +28,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final nameField = FormFieldComponents.regularTextField(
-        nameController, "First Name", true, Icons.account_circle);
+    final nameField = FormFieldComponents.regularTextField(nameController,
+        "First Name", true, Icons.account_circle, TextInputAction.next);
 
-    final surnameField = FormFieldComponents.regularTextField(
-        surnameController, "Surname", true, Icons.account_circle);
+    final surnameField = FormFieldComponents.regularTextField(surnameController,
+        "Surname", true, Icons.account_circle, TextInputAction.next);
 
-    final emailField = FormFieldComponents.emailField(emailController);
+    final emailField =
+        FormFieldComponents.emailField(emailController, TextInputAction.next);
 
     final passwordField = FormFieldComponents.passwordField(
         passwordController, TextInputAction.next);

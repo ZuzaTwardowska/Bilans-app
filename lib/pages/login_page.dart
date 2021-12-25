@@ -23,7 +23,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final emailField = FormFieldComponents.emailField(emailController);
+    final emailField =
+        FormFieldComponents.emailField(emailController, TextInputAction.next);
 
     final passwordField = FormFieldComponents.passwordField(
         passwordController, TextInputAction.done);

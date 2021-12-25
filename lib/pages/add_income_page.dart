@@ -43,17 +43,18 @@ class _AddIncomePageState extends State<AddIncomePage> {
     CollectionReference incomes =
         FirebaseFirestore.instance.collection('incomes');
 
-    final nameField = FormFieldComponents.regularTextField(
-        nameController, "Income title", true, Icons.category_rounded);
+    final nameField = FormFieldComponents.regularTextField(nameController,
+        "Income title", true, Icons.category_rounded, TextInputAction.next);
 
     final descriptionField = FormFieldComponents.regularTextField(
         descriptionController,
         "Income Description",
         false,
-        Icons.description_rounded);
+        Icons.description_rounded,
+        TextInputAction.next);
 
-    final amountField =
-        FormFieldComponents.amountTextField(amountController, "Cost");
+    final amountField = FormFieldComponents.amountTextField(
+        amountController, "Cost", TextInputAction.next);
 
     final categoryField = FormFieldComponents.dropdownCategoryListField(
         categories

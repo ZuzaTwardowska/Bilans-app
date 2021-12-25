@@ -39,14 +39,15 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
     CollectionReference categories =
         FirebaseFirestore.instance.collection('categories');
 
-    final nameField = FormFieldComponents.regularTextField(
-        nameController, "Category Name", true, Icons.category_rounded);
+    final nameField = FormFieldComponents.regularTextField(nameController,
+        "Category Name", true, Icons.category_rounded, TextInputAction.next);
 
     final descriptionField = FormFieldComponents.regularTextField(
         descriptionController,
         "Category Description",
         false,
-        Icons.description_rounded);
+        Icons.description_rounded,
+        TextInputAction.next);
 
     final typeField = FormField<String>(
       builder: (FormFieldState<String> state) {

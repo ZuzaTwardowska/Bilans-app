@@ -43,17 +43,18 @@ class _AddExpensePageState extends State<AddExpensePage> {
     CollectionReference expenses =
         FirebaseFirestore.instance.collection('expenses');
 
-    final nameField = FormFieldComponents.regularTextField(
-        nameController, "Expense title", true, Icons.category_rounded);
+    final nameField = FormFieldComponents.regularTextField(nameController,
+        "Expense title", true, Icons.category_rounded, TextInputAction.next);
 
     final descriptionField = FormFieldComponents.regularTextField(
         descriptionController,
         "Expense Description",
         false,
-        Icons.description_rounded);
+        Icons.description_rounded,
+        TextInputAction.next);
 
-    final amountField =
-        FormFieldComponents.amountTextField(amountController, "Cost");
+    final amountField = FormFieldComponents.amountTextField(
+        amountController, "Cost", TextInputAction.next);
 
     final categoryField = FormFieldComponents.dropdownCategoryListField(
         categories

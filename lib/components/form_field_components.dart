@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'form_validation.dart';
 
 class FormFieldComponents {
-  static TextFormField emailField(TextEditingController emailController) {
+  static TextFormField emailField(
+      TextEditingController emailController, TextInputAction inputAction) {
     return TextFormField(
       autofocus: false,
       controller: emailController,
@@ -13,7 +14,7 @@ class FormFieldComponents {
       onSaved: (value) {
         emailController.text = value!;
       },
-      textInputAction: TextInputAction.next,
+      textInputAction: inputAction,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.mail),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -23,7 +24,7 @@ class FormFieldComponents {
   }
 
   static TextFormField passwordField(
-      TextEditingController passwordController, TextInputAction action) {
+      TextEditingController passwordController, TextInputAction inputAction) {
     return TextFormField(
       autofocus: false,
       obscureText: true,
@@ -32,7 +33,7 @@ class FormFieldComponents {
       onSaved: (value) {
         passwordController.text = value!;
       },
-      textInputAction: action,
+      textInputAction: inputAction,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.vpn_key),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -44,7 +45,7 @@ class FormFieldComponents {
   static TextFormField confrimPasswordField(
       TextEditingController passwordController,
       String passwordValue,
-      TextInputAction action) {
+      TextInputAction inputAction) {
     return TextFormField(
       autofocus: false,
       obscureText: true,
@@ -54,7 +55,7 @@ class FormFieldComponents {
       onSaved: (value) {
         passwordController.text = value!;
       },
-      textInputAction: action,
+      textInputAction: inputAction,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.vpn_key),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -64,7 +65,7 @@ class FormFieldComponents {
   }
 
   static TextFormField regularTextField(TextEditingController controller,
-      String name, bool validate, IconData icon) {
+      String name, bool validate, IconData icon, TextInputAction inputAction) {
     return TextFormField(
       autofocus: false,
       validator: (value) =>
@@ -73,7 +74,7 @@ class FormFieldComponents {
       onSaved: (value) {
         controller.text = value!;
       },
-      textInputAction: TextInputAction.next,
+      textInputAction: inputAction,
       decoration: InputDecoration(
           prefixIcon: Icon(icon),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
@@ -82,8 +83,8 @@ class FormFieldComponents {
     );
   }
 
-  static TextFormField amountTextField(
-      TextEditingController controller, String name) {
+  static TextFormField amountTextField(TextEditingController controller,
+      String name, TextInputAction inputAction) {
     return TextFormField(
       autofocus: false,
       keyboardType: TextInputType.number,
@@ -92,7 +93,7 @@ class FormFieldComponents {
       onSaved: (value) {
         controller.text = value!;
       },
-      textInputAction: TextInputAction.done,
+      textInputAction: inputAction,
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.attach_money),
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
