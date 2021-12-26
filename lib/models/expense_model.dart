@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ExpenseModel {
   String? id;
   String? userId;
@@ -5,6 +7,7 @@ class ExpenseModel {
   String? description;
   String? categoryId;
   String? amount;
+  DateTime? date;
 
   ExpenseModel(
       {this.id,
@@ -12,7 +15,8 @@ class ExpenseModel {
       this.name,
       this.description,
       this.categoryId,
-      this.amount});
+      this.amount,
+      this.date});
 
   factory ExpenseModel.fromMap(map) {
     return ExpenseModel(
@@ -22,6 +26,7 @@ class ExpenseModel {
       description: map['description'],
       categoryId: map['categoryId'],
       amount: map['amount'],
+      date: DateTime.fromMillisecondsSinceEpoch(map['date'].seconds * 1000),
     );
   }
 
@@ -33,6 +38,7 @@ class ExpenseModel {
       'description': description,
       'categoryId': categoryId,
       'amount': amount,
+      'date': date,
     };
   }
 }

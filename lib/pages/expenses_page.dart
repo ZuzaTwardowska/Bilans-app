@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'add_expense_page.dart';
+import 'package:intl/intl.dart';
 
 class ExpensesPage extends StatefulWidget {
   const ExpensesPage({Key? key}) : super(key: key);
@@ -95,6 +96,11 @@ class _ExpensesPageState extends State<ExpensesPage> {
                             ),
                             Text(categories[ExpenseModel.fromMap(doc.data()!)
                                 .categoryId!]!),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(DateFormat("dd-MM-yyyy").format(
+                                ExpenseModel.fromMap(doc.data()!).date!)),
                           ],
                         ),
                       ),

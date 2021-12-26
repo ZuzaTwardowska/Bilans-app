@@ -99,21 +99,23 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         ),
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                const SizedBox(height: 120),
-                nameField,
-                const SizedBox(height: 20),
-                descriptionField,
-                const SizedBox(height: 20),
-                typeField,
-                const SizedBox(height: 40),
-                addButton,
-              ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(height: 120),
+                  nameField,
+                  const SizedBox(height: 20),
+                  descriptionField,
+                  const SizedBox(height: 20),
+                  typeField,
+                  const SizedBox(height: 40),
+                  addButton,
+                ],
+              ),
             ),
           ),
         ),

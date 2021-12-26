@@ -1,7 +1,9 @@
 import 'package:bilans/models/category_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'form_validation.dart';
+import 'package:intl/intl.dart';
 
 class FormFieldComponents {
   static TextFormField emailField(
@@ -99,6 +101,57 @@ class FormFieldComponents {
           contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText: name,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
+    );
+  }
+
+  static TextButton dateField(
+      BuildContext context, DateTime? dateController, Function setDate) {
+    return TextButton(
+      onPressed: () {
+        DatePicker.showDatePicker(context,
+            showTitleActions: true,
+            minTime: DateTime(2010, 1, 1),
+            maxTime: DateTime.now(),
+            theme: const DatePickerTheme(
+                headerColor: Colors.redAccent,
+                backgroundColor: Colors.white,
+                itemStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+                doneStyle: TextStyle(color: Colors.white, fontSize: 16)),
+            onConfirm: (date) {
+          setDate(date);
+        }, currentTime: DateTime.now(), locale: LocaleType.en);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.date_range_outlined,
+                color: Colors.grey,
+              ),
+              const SizedBox(
+                width: 20,
+              ),
+              Text(
+                dateController == null
+                    ? "Date"
+                    : DateFormat("dd-MM-yyyy").format(dateController),
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

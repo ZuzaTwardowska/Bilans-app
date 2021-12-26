@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'add_income_page.dart';
+import 'package:intl/intl.dart';
 
 class IncomesPage extends StatefulWidget {
   const IncomesPage({Key? key}) : super(key: key);
@@ -95,6 +96,11 @@ class _IncomesPageState extends State<IncomesPage> {
                             ),
                             Text(categories[
                                 IncomeModel.fromMap(doc.data()!).categoryId!]!),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(DateFormat("dd-MM-yyyy").format(
+                                IncomeModel.fromMap(doc.data()!).date!)),
                           ],
                         ),
                       ),

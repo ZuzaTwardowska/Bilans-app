@@ -20,6 +20,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final amountController = TextEditingController();
+  DateTime? dateControll;
   String? selectedCategory;
   String? errorMessage;
 
@@ -64,6 +65,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
         selectedCategory,
         setCategory);
 
+    final dateField =
+        FormFieldComponents.dateField(context, dateControll, setDate);
+
     final addButton = FormFieldComponents.addNewElement(
         context, expenses, addExpense, "Add Expense");
 
@@ -77,23 +81,27 @@ class _AddExpensePageState extends State<AddExpensePage> {
         ),
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                const SizedBox(height: 80),
-                nameField,
-                const SizedBox(height: 20),
-                descriptionField,
-                const SizedBox(height: 20),
-                categoryField,
-                const SizedBox(height: 20),
-                amountField,
-                const SizedBox(height: 40),
-                addButton,
-              ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(height: 60),
+                  nameField,
+                  const SizedBox(height: 20),
+                  descriptionField,
+                  const SizedBox(height: 20),
+                  categoryField,
+                  const SizedBox(height: 20),
+                  amountField,
+                  const SizedBox(height: 20),
+                  dateField,
+                  const SizedBox(height: 40),
+                  addButton,
+                ],
+              ),
             ),
           ),
         ),
@@ -102,7 +110,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
   }
 
   void addExpense(CollectionReference expenses) async {
-    if (selectedCategory == null || !_formKey.currentState!.validate()) {
+    if (selectedCategory == null ||
+        !_formKey.currentState!.validate() ||
+        dateControll == null) {
       Fluttertoast.showToast(msg: "Provide all data!");
       return;
     }
@@ -113,6 +123,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
           'amount': Numeric.formatPrice(amountController.text),
           'userId': loggedInUser.uid,
           'categoryId': selectedCategory,
+          'date': dateControll,
           'id': expenses.doc().id,
         })
         .then((value) => Fluttertoast.showToast(msg: "Expense added!"))
@@ -124,6 +135,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void setCategory(String value) {
     setState(() {
       selectedCategory = value;
+    });
+  }
+
+  void setDate(DateTime value) {
+    setState(() {
+      dateControll = value;
     });
   }
 }

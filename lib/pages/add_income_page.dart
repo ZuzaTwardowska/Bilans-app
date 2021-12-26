@@ -22,6 +22,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
   final amountController = TextEditingController();
   String? selectedCategory;
   String? errorMessage;
+  DateTime? dateControll;
 
   @override
   void initState() {
@@ -64,6 +65,9 @@ class _AddIncomePageState extends State<AddIncomePage> {
         selectedCategory,
         setCategory);
 
+    final dateField =
+        FormFieldComponents.dateField(context, dateControll, setDate);
+
     final addButton = FormFieldComponents.addNewElement(
         context, incomes, addIncome, "Add Income");
 
@@ -77,23 +81,27 @@ class _AddIncomePageState extends State<AddIncomePage> {
         ),
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                const SizedBox(height: 80),
-                nameField,
-                const SizedBox(height: 20),
-                descriptionField,
-                const SizedBox(height: 20),
-                categoryField,
-                const SizedBox(height: 20),
-                amountField,
-                const SizedBox(height: 40),
-                addButton,
-              ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  const SizedBox(height: 60),
+                  nameField,
+                  const SizedBox(height: 20),
+                  descriptionField,
+                  const SizedBox(height: 20),
+                  categoryField,
+                  const SizedBox(height: 20),
+                  amountField,
+                  const SizedBox(height: 20),
+                  dateField,
+                  const SizedBox(height: 40),
+                  addButton,
+                ],
+              ),
             ),
           ),
         ),
@@ -102,7 +110,9 @@ class _AddIncomePageState extends State<AddIncomePage> {
   }
 
   void addIncome(CollectionReference incomes) async {
-    if (selectedCategory == null || !_formKey.currentState!.validate()) {
+    if (selectedCategory == null ||
+        !_formKey.currentState!.validate() ||
+        dateControll == null) {
       Fluttertoast.showToast(msg: "Provide all data!");
       return;
     }
@@ -113,6 +123,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
           'amount': Numeric.formatPrice(amountController.text),
           'userId': loggedInUser.uid,
           'categoryId': selectedCategory,
+          'date': dateControll,
           'id': incomes.doc().id,
         })
         .then((value) => Fluttertoast.showToast(msg: "Income added!"))
@@ -124,6 +135,12 @@ class _AddIncomePageState extends State<AddIncomePage> {
   void setCategory(String value) {
     setState(() {
       selectedCategory = value;
+    });
+  }
+
+  void setDate(DateTime value) {
+    setState(() {
+      dateControll = value;
     });
   }
 }
