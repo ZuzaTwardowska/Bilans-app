@@ -57,8 +57,10 @@ class _ExpensesPageState extends State<ExpensesPage> {
         "Add Expense");
 
     final list = StreamBuilder<QuerySnapshot>(
-        stream:
-            expenses.where("userId", isEqualTo: loggedInUser.uid).snapshots(),
+        stream: expenses
+            .where("userId", isEqualTo: loggedInUser.uid)
+            .orderBy('date', descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData || categories.isEmpty) {
             return const Center(

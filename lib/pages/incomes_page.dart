@@ -57,8 +57,10 @@ class _IncomesPageState extends State<IncomesPage> {
         "Add Income");
 
     final list = StreamBuilder<QuerySnapshot>(
-        stream:
-            incomes.where("userId", isEqualTo: loggedInUser.uid).snapshots(),
+        stream: incomes
+            .where("userId", isEqualTo: loggedInUser.uid)
+            .orderBy('date', descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData || categories.isEmpty) {
             return const Center(

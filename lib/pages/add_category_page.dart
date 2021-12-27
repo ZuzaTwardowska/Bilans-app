@@ -106,7 +106,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
               key: _formKey,
               child: Column(
                 children: <Widget>[
-                  const SizedBox(height: 120),
+                  const SizedBox(height: 60),
                   nameField,
                   const SizedBox(height: 20),
                   descriptionField,
