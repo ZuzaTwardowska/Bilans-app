@@ -7,6 +7,7 @@ import 'categories_page.dart';
 import 'expenses_page.dart';
 import 'incomes_page.dart';
 import 'login_page.dart';
+import 'reports_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -54,9 +55,9 @@ class _HomePageState extends State<HomePage> {
 
     final tableButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const HomePage())),
-        "View Table");
+        () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ReportsPage())),
+        "Reports and Charts");
 
     final logoutButton = Material(
       elevation: 5,
