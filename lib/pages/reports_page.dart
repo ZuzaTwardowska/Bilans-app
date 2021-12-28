@@ -1,5 +1,4 @@
-import 'package:bilans/models/expense_model.dart';
-import 'package:bilans/models/income_model.dart';
+import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,9 +15,13 @@ class ReportsPage extends StatefulWidget {
 class _ReportsPageState extends State<ReportsPage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
-  double expenseAmount = 0;
-  double incomeAmount = 0;
   String dropdownValue = 'All';
+  var chartWidget = const Padding(
+    padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
+    child: Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
 
   @override
   void initState() {
@@ -29,51 +32,12 @@ class _ReportsPageState extends State<ReportsPage> {
         .get()
         .then((value) {
       loggedInUser = UserModel.fromMap(value.data());
-
-      FirebaseFirestore.instance
-          .collection('expenses')
-          .where("userId", isEqualTo: loggedInUser.uid)
-          .get()
-          .then((query) => {
-                for (var item in query.docs)
-                  {
-                    setState(() {
-                      expenseAmount +=
-                          double.parse(ExpenseModel.fromMap(item).amount!);
-                    }),
-                  },
-              });
-      FirebaseFirestore.instance
-          .collection('incomes')
-          .where("userId", isEqualTo: loggedInUser.uid)
-          .get()
-          .then((query) => {
-                for (var item in query.docs)
-                  {
-                    setState(() {
-                      incomeAmount +=
-                          double.parse(IncomeModel.fromMap(item).amount!);
-                    }),
-                  },
-              });
+      rebuildChart("All");
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Map<String, double> series = {
-      "Incomes": incomeAmount,
-      "Expenses": expenseAmount,
-    };
-
-    var chartWidget = Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: SizedBox(
-        height: 200.0,
-        child: PieChart(dataMap: series),
-      ),
-    );
-
     final periodDropdown = DropdownButton<String>(
       value: dropdownValue,
       icon: const Icon(
@@ -89,7 +53,7 @@ class _ReportsPageState extends State<ReportsPage> {
       onChanged: (String? newValue) {
         setState(() {
           dropdownValue = newValue!;
-          recalculateData(newValue);
+          rebuildChart(newValue);
         });
       },
       items: <String>['Month', 'Two Months', 'All']
@@ -131,118 +95,29 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  void recalculateData(String period) {
-    var date = DateTime.now();
-    switch (period) {
-      case 'Month':
-        {
-          expenseAmount = 0;
-          incomeAmount = 0;
-          FirebaseFirestore.instance
-              .collection('expenses')
-              .where("userId", isEqualTo: loggedInUser.uid)
-              .where("date",
-                  isLessThanOrEqualTo: DateTime(date.year, date.month, 1))
-              .get()
-              .then((query) => {
-                    for (var item in query.docs)
-                      {
-                        setState(() {
-                          expenseAmount +=
-                              double.parse(ExpenseModel.fromMap(item).amount!);
-                        }),
-                      },
-                  });
-          FirebaseFirestore.instance
-              .collection('incomes')
-              .where("userId", isEqualTo: loggedInUser.uid)
-              .where("date",
-                  isLessThanOrEqualTo: DateTime(date.year, date.month, 1))
-              .get()
-              .then((query) => {
-                    for (var item in query.docs)
-                      {
-                        setState(() {
-                          incomeAmount +=
-                              double.parse(IncomeModel.fromMap(item).amount!);
-                        }),
-                      },
-                  });
-          break;
-        }
-      case 'Two Months':
-        {
-          DateTime dateBorder;
-          if (date.month > 1) {
-            dateBorder = DateTime(date.year, date.month - 1, 1);
-          } else {
-            dateBorder = DateTime(date.year - 1, 12, 1);
-          }
-          expenseAmount = 0;
-          incomeAmount = 0;
-          FirebaseFirestore.instance
-              .collection('expenses')
-              .where("userId", isEqualTo: loggedInUser.uid)
-              .where("date", isLessThanOrEqualTo: dateBorder)
-              .get()
-              .then((query) => {
-                    for (var item in query.docs)
-                      {
-                        setState(() {
-                          expenseAmount +=
-                              double.parse(ExpenseModel.fromMap(item).amount!);
-                        }),
-                      },
-                  });
-          FirebaseFirestore.instance
-              .collection('incomes')
-              .where("userId", isEqualTo: loggedInUser.uid)
-              .where("date", isLessThanOrEqualTo: dateBorder)
-              .get()
-              .then((query) => {
-                    for (var item in query.docs)
-                      {
-                        setState(() {
-                          incomeAmount +=
-                              double.parse(IncomeModel.fromMap(item).amount!);
-                        }),
-                      },
-                  });
-          break;
-        }
-      case 'All':
-        {
-          expenseAmount = 0;
-          incomeAmount = 0;
-          FirebaseFirestore.instance
-              .collection('expenses')
-              .where("userId", isEqualTo: loggedInUser.uid)
-              .get()
-              .then((query) => {
-                    for (var item in query.docs)
-                      {
-                        setState(() {
-                          expenseAmount +=
-                              double.parse(ExpenseModel.fromMap(item).amount!);
-                        }),
-                      },
-                  });
-          FirebaseFirestore.instance
-              .collection('incomes')
-              .where("userId", isEqualTo: loggedInUser.uid)
-              .get()
-              .then((query) => {
-                    for (var item in query.docs)
-                      {
-                        setState(() {
-                          incomeAmount +=
-                              double.parse(IncomeModel.fromMap(item).amount!);
-                        }),
-                      },
-                  });
-          break;
-        }
-      default:
-    }
+  void rebuildChart(String period) async {
+    setState(() {
+      chartWidget = const Padding(
+        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    });
+    var seriesList = await ChartComponents.recalculateDataIncomeExpanse(
+        period, loggedInUser);
+    Map<String, double> series = {
+      "Incomes": seriesList[0],
+      "Expenses": seriesList[1],
+    };
+    setState(() {
+      chartWidget = Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: SizedBox(
+          height: 200.0,
+          child: PieChart(dataMap: series),
+        ),
+      );
+    });
   }
 }
