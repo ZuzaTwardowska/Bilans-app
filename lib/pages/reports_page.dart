@@ -1,4 +1,5 @@
 import 'package:bilans/components/chart_components.dart';
+import 'package:bilans/components/page_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,62 +40,11 @@ class _ReportsPageState extends State<ReportsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final periodDropdown = DropdownButton<String>(
-      value: periodValue,
-      icon: const Icon(
-        Icons.arrow_downward,
-        color: Colors.redAccent,
-      ),
-      elevation: 16,
-      style: const TextStyle(color: Colors.redAccent),
-      underline: Container(
-        height: 2,
-        color: Colors.redAccent,
-      ),
-      onChanged: (String? newValue) {
-        setState(() {
-          periodValue = newValue!;
-          rebuildChart();
-        });
-      },
-      items: <String>['Month', 'Two Months', 'All']
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
+    final periodDropdown = PageComponents.dropdownOptions(
+        periodValue, setPeriod, ['Month', 'Two Months', 'All']);
 
-    final typeDropdown = DropdownButton<String>(
-      value: typeValue,
-      icon: const Icon(
-        Icons.arrow_downward,
-        color: Colors.redAccent,
-      ),
-      elevation: 16,
-      style: const TextStyle(color: Colors.redAccent),
-      underline: Container(
-        height: 2,
-        color: Colors.redAccent,
-      ),
-      onChanged: (String? newValue) {
-        setState(() {
-          typeValue = newValue!;
-          rebuildChart();
-        });
-      },
-      items: <String>[
-        'Incomes vs Expenses',
-        'Income Categories',
-        'Expense Categories'
-      ].map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
+    final typeDropdown = PageComponents.dropdownOptions(typeValue, setType,
+        ['Incomes vs Expenses', 'Income Categories', 'Expense Categories']);
 
     return Scaffold(
       appBar: AppBar(
@@ -127,87 +77,60 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  void rebuildChartIncomeExpenses(String period) async {
-    setState(() {
-      chartWidget = const Padding(
-        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    });
-    var seriesList = await ChartComponents.recalculateDataIncomeExpanse(
-        period, loggedInUser);
-    Map<String, double> series = {
-      "Incomes": seriesList[0],
-      "Expenses": seriesList[1],
-    };
-    setState(() {
-      chartWidget = Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: SizedBox(
-          height: 200.0,
-          child: PieChart(dataMap: series),
-        ),
-      );
-    });
-  }
-
-  void rebuildChartIncomeCategories(String period) async {
-    setState(() {
-      chartWidget = const Padding(
-        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    });
-    var series = await ChartComponents.recalculateDataIncomeCategories(
-        period, loggedInUser);
-    setState(() {
-      chartWidget = Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: SizedBox(
-          height: 200.0,
-          child: PieChart(dataMap: series),
-        ),
-      );
-    });
-  }
-
-  void rebuildChartExpenseCategories(String period) async {
-    setState(() {
-      chartWidget = const Padding(
-        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    });
-    var series = await ChartComponents.recalculateDataExpenseCategories(
-        period, loggedInUser);
-    setState(() {
-      chartWidget = Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: SizedBox(
-          height: 200.0,
-          child: PieChart(dataMap: series),
-        ),
-      );
-    });
-  }
-
-  void rebuildChart() {
+  void rebuildChart() async {
+    Map<String, double> series = {};
+    setLoadingComponent();
     switch (typeValue) {
       case "Incomes vs Expenses":
-        rebuildChartIncomeExpenses(periodValue);
+        series = await ChartComponents.recalculateDataIncomeExpanse(
+            periodValue, loggedInUser);
         break;
       case "Income Categories":
-        rebuildChartIncomeCategories(periodValue);
+        series = await ChartComponents.recalculateDataIncomeCategories(
+            periodValue, loggedInUser);
         break;
       case "Expense Categories":
-        rebuildChartExpenseCategories(periodValue);
+        series = await ChartComponents.recalculateDataExpenseCategories(
+            periodValue, loggedInUser);
         break;
     }
+    setDataChart(series);
+  }
+
+  void setLoadingComponent() {
+    setState(() {
+      chartWidget = const Padding(
+        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    });
+  }
+
+  void setDataChart(Map<String, double> series) {
+    setState(() {
+      chartWidget = Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: SizedBox(
+          height: 200.0,
+          child: PieChart(dataMap: series),
+        ),
+      );
+    });
+  }
+
+  void setPeriod(String value) {
+    setState(() {
+      periodValue = value;
+      rebuildChart();
+    });
+  }
+
+  void setType(String value) {
+    setState(() {
+      typeValue = value;
+      rebuildChart();
+    });
   }
 }

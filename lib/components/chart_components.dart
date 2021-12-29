@@ -5,7 +5,7 @@ import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChartComponents {
-  static Future<List<double>> recalculateDataIncomeExpanse(
+  static Future<Map<String, double>> recalculateDataIncomeExpanse(
       String period, UserModel loggedInUser) async {
     double expenseAmount = 0;
     double incomeAmount = 0;
@@ -35,7 +35,7 @@ class ChartComponents {
                       double.parse(IncomeModel.fromMap(item).amount!)
                 },
             });
-    return [incomeAmount, expenseAmount];
+    return {"Incomes": incomeAmount, "Expenses": expenseAmount};
   }
 
   static DateTime getDateBorder(String period) {

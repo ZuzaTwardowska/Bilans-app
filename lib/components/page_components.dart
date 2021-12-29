@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class PageComponents {
@@ -21,6 +20,32 @@ class PageComponents {
               fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
+    );
+  }
+
+  static DropdownButton<String> dropdownOptions(
+      String changeValue, Function changeFunction, List<String> values) {
+    return DropdownButton<String>(
+      value: changeValue,
+      icon: const Icon(
+        Icons.arrow_downward,
+        color: Colors.redAccent,
+      ),
+      elevation: 16,
+      style: const TextStyle(color: Colors.redAccent),
+      underline: Container(
+        height: 2,
+        color: Colors.redAccent,
+      ),
+      onChanged: (String? newValue) {
+        changeFunction(newValue!);
+      },
+      items: values.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 }
