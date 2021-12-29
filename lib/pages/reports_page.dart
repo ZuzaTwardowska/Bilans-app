@@ -15,7 +15,8 @@ class ReportsPage extends StatefulWidget {
 class _ReportsPageState extends State<ReportsPage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
-  String dropdownValue = 'All';
+  String periodValue = 'All';
+  String typeValue = 'Incomes vs Expenses';
   var chartWidget = const Padding(
     padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
     child: Center(
@@ -32,14 +33,14 @@ class _ReportsPageState extends State<ReportsPage> {
         .get()
         .then((value) {
       loggedInUser = UserModel.fromMap(value.data());
-      rebuildChart("All");
+      rebuildChart();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final periodDropdown = DropdownButton<String>(
-      value: dropdownValue,
+      value: periodValue,
       icon: const Icon(
         Icons.arrow_downward,
         color: Colors.redAccent,
@@ -52,12 +53,42 @@ class _ReportsPageState extends State<ReportsPage> {
       ),
       onChanged: (String? newValue) {
         setState(() {
-          dropdownValue = newValue!;
-          rebuildChart(newValue);
+          periodValue = newValue!;
+          rebuildChart();
         });
       },
       items: <String>['Month', 'Two Months', 'All']
           .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+
+    final typeDropdown = DropdownButton<String>(
+      value: typeValue,
+      icon: const Icon(
+        Icons.arrow_downward,
+        color: Colors.redAccent,
+      ),
+      elevation: 16,
+      style: const TextStyle(color: Colors.redAccent),
+      underline: Container(
+        height: 2,
+        color: Colors.redAccent,
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          typeValue = newValue!;
+          rebuildChart();
+        });
+      },
+      items: <String>[
+        'Incomes vs Expenses',
+        'Income Categories',
+        'Expense Categories'
+      ].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
@@ -88,14 +119,15 @@ class _ReportsPageState extends State<ReportsPage> {
               ),
             ),
             chartWidget,
-            periodDropdown
+            periodDropdown,
+            typeDropdown
           ],
         ),
       ),
     );
   }
 
-  void rebuildChart(String period) async {
+  void rebuildChartIncomeExpenses(String period) async {
     setState(() {
       chartWidget = const Padding(
         padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
@@ -119,5 +151,63 @@ class _ReportsPageState extends State<ReportsPage> {
         ),
       );
     });
+  }
+
+  void rebuildChartIncomeCategories(String period) async {
+    setState(() {
+      chartWidget = const Padding(
+        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    });
+    var series = await ChartComponents.recalculateDataIncomeCategories(
+        period, loggedInUser);
+    setState(() {
+      chartWidget = Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: SizedBox(
+          height: 200.0,
+          child: PieChart(dataMap: series),
+        ),
+      );
+    });
+  }
+
+  void rebuildChartExpenseCategories(String period) async {
+    setState(() {
+      chartWidget = const Padding(
+        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    });
+    var series = await ChartComponents.recalculateDataExpenseCategories(
+        period, loggedInUser);
+    setState(() {
+      chartWidget = Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: SizedBox(
+          height: 200.0,
+          child: PieChart(dataMap: series),
+        ),
+      );
+    });
+  }
+
+  void rebuildChart() {
+    switch (typeValue) {
+      case "Incomes vs Expenses":
+        rebuildChartIncomeExpenses(periodValue);
+        break;
+      case "Income Categories":
+        rebuildChartIncomeCategories(periodValue);
+        break;
+      case "Expense Categories":
+        rebuildChartExpenseCategories(periodValue);
+        break;
+    }
   }
 }
