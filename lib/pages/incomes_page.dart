@@ -1,3 +1,4 @@
+import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/page_components.dart';
 import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/income_model.dart';
@@ -19,6 +20,12 @@ class _IncomesPageState extends State<IncomesPage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
   Map<String, String> categories = {};
+  SizedBox list = const SizedBox(
+    height: 400,
+    child: Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
 
   @override
   void initState() {
@@ -29,97 +36,17 @@ class _IncomesPageState extends State<IncomesPage> {
         .get()
         .then((value) {
       loggedInUser = UserModel.fromMap(value.data());
-      FirebaseFirestore.instance
-          .collection('categories')
-          .where("userId", isEqualTo: loggedInUser.uid)
-          .where("type", isEqualTo: "Income Category")
-          .get()
-          .then((query) => {
-                for (var item in query.docs)
-                  {
-                    categories.putIfAbsent(CategoryModel.fromMap(item).id!,
-                        () => CategoryModel.fromMap(item).name!)
-                  },
-                setState(() {})
-              });
+      setList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference incomes =
-        FirebaseFirestore.instance.collection('incomes');
-
     final addIncomeButton = PageComponents.redirectButton(
         context,
         () => Navigator.push(context,
             MaterialPageRoute(builder: (context) => const AddIncomePage())),
         "Add Income");
-
-    final list = StreamBuilder<QuerySnapshot>(
-        stream: incomes
-            .where("userId", isEqualTo: loggedInUser.uid)
-            .orderBy('date', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || categories.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            if (snapshot.data!.docs.isNotEmpty) {
-              return Scrollbar(
-                child: ListView(
-                  children: snapshot.data!.docs.map((doc) {
-                    return Card(
-                      child: ListTile(
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(IncomeModel.fromMap(doc.data()!).name!),
-                            MaterialButton(
-                              onPressed: () {
-                                doc.reference.delete();
-                              },
-                              child: const Icon(
-                                Icons.remove,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                        subtitle: Row(
-                          children: [
-                            Text(IncomeModel.fromMap(doc.data()!)
-                                .amount!
-                                .toString()),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text(categories[
-                                IncomeModel.fromMap(doc.data()!).categoryId!]!),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text(DateFormat("dd-MM-yyyy").format(
-                                IncomeModel.fromMap(doc.data()!).date!)),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              );
-            } else {
-              return const Center(
-                child: Text(
-                  "No Incomes yet",
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
-            }
-          }
-        });
 
     return Scaffold(
         appBar: AppBar(
@@ -142,7 +69,7 @@ class _IncomesPageState extends State<IncomesPage> {
               const SizedBox(
                 height: 10,
               ),
-              SizedBox(height: 400, child: list),
+              list,
               const SizedBox(
                 height: 40,
               ),
@@ -150,5 +77,81 @@ class _IncomesPageState extends State<IncomesPage> {
             ],
           ),
         ));
+  }
+
+  void setList() async {
+    categories =
+        await ChartComponents.readCategories("Income Category", loggedInUser);
+    setState(() {
+      list = SizedBox(
+          height: 400,
+          child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('incomes')
+                  .where("userId", isEqualTo: loggedInUser.uid)
+                  .orderBy('date', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || categories.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  if (snapshot.data!.docs.isNotEmpty) {
+                    return Scrollbar(
+                      child: ListView(
+                        children: snapshot.data!.docs.map((doc) {
+                          return Card(
+                            child: ListTile(
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(IncomeModel.fromMap(doc.data()!).name!),
+                                  MaterialButton(
+                                    onPressed: () {
+                                      doc.reference.delete();
+                                    },
+                                    child: const Icon(
+                                      Icons.remove,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              subtitle: Row(
+                                children: [
+                                  Text(IncomeModel.fromMap(doc.data()!)
+                                      .amount!
+                                      .toString()),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(categories[
+                                      IncomeModel.fromMap(doc.data()!)
+                                          .categoryId!]!),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(DateFormat("dd-MM-yyyy").format(
+                                      IncomeModel.fromMap(doc.data()!).date!)),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  } else {
+                    return const Center(
+                      child: Text(
+                        "No Incomes yet",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  }
+                }
+              }));
+    });
   }
 }

@@ -1,3 +1,4 @@
+import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/page_components.dart';
 import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/expense_model.dart';
@@ -19,6 +20,12 @@ class _ExpensesPageState extends State<ExpensesPage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
   Map<String, String> categories = {};
+  SizedBox list = const SizedBox(
+    height: 400,
+    child: Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
 
   @override
   void initState() {
@@ -29,126 +36,123 @@ class _ExpensesPageState extends State<ExpensesPage> {
         .get()
         .then((value) {
       loggedInUser = UserModel.fromMap(value.data());
-      FirebaseFirestore.instance
-          .collection('categories')
-          .where("userId", isEqualTo: loggedInUser.uid)
-          .where("type", isEqualTo: "Expense Category")
-          .get()
-          .then((query) => {
-                for (var item in query.docs)
-                  {
-                    categories.putIfAbsent(CategoryModel.fromMap(item).id!,
-                        () => CategoryModel.fromMap(item).name!)
-                  },
-                setState(() {})
-              });
+      setList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference expenses =
-        FirebaseFirestore.instance.collection('expenses');
-
     final addExpenseButton = PageComponents.redirectButton(
         context,
         () => Navigator.push(context,
             MaterialPageRoute(builder: (context) => const AddExpensePage())),
         "Add Expense");
 
-    final list = StreamBuilder<QuerySnapshot>(
-        stream: expenses
-            .where("userId", isEqualTo: loggedInUser.uid)
-            .orderBy('date', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || categories.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            if (snapshot.data!.docs.isNotEmpty) {
-              return Scrollbar(
-                child: ListView(
-                  children: snapshot.data!.docs.map((doc) {
-                    return Card(
-                      child: ListTile(
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(ExpenseModel.fromMap(doc.data()!).name!),
-                            MaterialButton(
-                              onPressed: () {
-                                doc.reference.delete();
-                              },
-                              child: const Icon(
-                                Icons.remove,
-                                color: Colors.red,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.red),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            const Text(
+              "Your Expenses:",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            list,
+            const SizedBox(
+              height: 40,
+            ),
+            addExpenseButton
+          ],
+        ),
+      ),
+    );
+  }
+
+  void setList() async {
+    categories =
+        await ChartComponents.readCategories("Expense Category", loggedInUser);
+    setState(() {
+      list = SizedBox(
+          height: 400,
+          child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('expenses')
+                  .where("userId", isEqualTo: loggedInUser.uid)
+                  .orderBy('date', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || categories.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  if (snapshot.data!.docs.isNotEmpty) {
+                    return Scrollbar(
+                      child: ListView(
+                        children: snapshot.data!.docs.map((doc) {
+                          return Card(
+                            child: ListTile(
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(ExpenseModel.fromMap(doc.data()!).name!),
+                                  MaterialButton(
+                                    onPressed: () {
+                                      doc.reference.delete();
+                                    },
+                                    child: const Icon(
+                                      Icons.remove,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              subtitle: Row(
+                                children: [
+                                  Text(ExpenseModel.fromMap(doc.data()!)
+                                      .amount!
+                                      .toString()),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(categories[
+                                      ExpenseModel.fromMap(doc.data()!)
+                                          .categoryId!]!),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(DateFormat("dd-MM-yyyy").format(
+                                      ExpenseModel.fromMap(doc.data()!).date!)),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                        subtitle: Row(
-                          children: [
-                            Text(ExpenseModel.fromMap(doc.data()!)
-                                .amount!
-                                .toString()),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text(categories[ExpenseModel.fromMap(doc.data()!)
-                                .categoryId!]!),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text(DateFormat("dd-MM-yyyy").format(
-                                ExpenseModel.fromMap(doc.data()!).date!)),
-                          ],
-                        ),
+                          );
+                        }).toList(),
                       ),
                     );
-                  }).toList(),
-                ),
-              );
-            } else {
-              return const Center(
-                child: Text(
-                  "No Expenses yet",
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
-            }
-          }
-        });
-
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.red),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              const Text(
-                "Your Expenses:",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SizedBox(height: 400, child: list),
-              const SizedBox(
-                height: 40,
-              ),
-              addExpenseButton
-            ],
-          ),
-        ));
+                  } else {
+                    return const Center(
+                      child: Text(
+                        "No Expenses yet",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  }
+                }
+              }));
+    });
   }
 }
