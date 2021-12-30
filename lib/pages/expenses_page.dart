@@ -1,6 +1,5 @@
 import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/page_components.dart';
-import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/expense_model.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'add_expense_page.dart';
 import 'package:intl/intl.dart';
+
+import 'expense_model_page.dart';
 
 class ExpensesPage extends StatefulWidget {
   const ExpensesPage({Key? key}) : super(key: key);
@@ -104,6 +105,17 @@ class _ExpensesPageState extends State<ExpensesPage> {
                         children: snapshot.data!.docs.map((doc) {
                           return Card(
                             child: ListTile(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ExpenseModelPage(
+                                    expense: ExpenseModel.fromMap(doc.data()!),
+                                    category: categories[
+                                        ExpenseModel.fromMap(doc.data()!)
+                                            .categoryId!]!,
+                                  ),
+                                ),
+                              ),
                               title: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,

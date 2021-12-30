@@ -1,6 +1,5 @@
 import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/page_components.dart';
-import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/income_model.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'add_income_page.dart';
 import 'package:intl/intl.dart';
+
+import 'income_model.page.dart';
 
 class IncomesPage extends StatefulWidget {
   const IncomesPage({Key? key}) : super(key: key);
@@ -103,6 +104,17 @@ class _IncomesPageState extends State<IncomesPage> {
                         children: snapshot.data!.docs.map((doc) {
                           return Card(
                             child: ListTile(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => IncomeModelPage(
+                                    income: IncomeModel.fromMap(doc.data()!),
+                                    category: categories[
+                                        IncomeModel.fromMap(doc.data()!)
+                                            .categoryId!]!,
+                                  ),
+                                ),
+                              ),
                               title: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
