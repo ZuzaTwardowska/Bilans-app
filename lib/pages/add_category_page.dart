@@ -1,20 +1,19 @@
 import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AddCategoryPage extends StatefulWidget {
-  const AddCategoryPage({Key? key}) : super(key: key);
+  final UserModel loggedInUser;
+  const AddCategoryPage({Key? key, required this.loggedInUser})
+      : super(key: key);
 
   @override
   _AddCategoryPageState createState() => _AddCategoryPageState();
 }
 
 class _AddCategoryPageState extends State<AddCategoryPage> {
-  User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -24,14 +23,6 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
   }
 
   @override
@@ -130,7 +121,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         .add({
           'name': nameController.text,
           'description': descriptionController.text,
-          'userId': loggedInUser.uid,
+          'userId': widget.loggedInUser.uid,
           'type': selectedType,
           'id': categories.doc().id,
         })

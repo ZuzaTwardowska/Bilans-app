@@ -7,15 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AddExpensePage extends StatefulWidget {
-  const AddExpensePage({Key? key}) : super(key: key);
+  final UserModel loggedInUser;
+  const AddExpensePage({Key? key, required this.loggedInUser})
+      : super(key: key);
 
   @override
   _AddExpensePageState createState() => _AddExpensePageState();
 }
 
 class _AddExpensePageState extends State<AddExpensePage> {
-  User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -27,14 +27,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
   }
 
   @override
@@ -59,7 +51,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
     final categoryField = FormFieldComponents.dropdownCategoryListField(
         categories
-            .where("userId", isEqualTo: loggedInUser.uid)
+            .where("userId", isEqualTo: widget.loggedInUser.uid)
             .where("type", isEqualTo: "Expense Category")
             .snapshots(),
         selectedCategory,
@@ -121,7 +113,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
           'name': nameController.text,
           'description': descriptionController.text,
           'amount': Numeric.formatPrice(amountController.text),
-          'userId': loggedInUser.uid,
+          'userId': widget.loggedInUser.uid,
           'categoryId': selectedCategory,
           'date': dateControll,
           'id': expenses.doc().id,

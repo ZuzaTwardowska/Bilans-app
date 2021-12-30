@@ -1,6 +1,4 @@
 import 'package:bilans/models/expense_model.dart';
-import 'package:bilans/models/user_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -16,9 +14,6 @@ class ExpenseModelPage extends StatefulWidget {
 }
 
 class _ExpenseModelPageState extends State<ExpenseModelPage> {
-  User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
-
   @override
   void initState() {
     super.initState();

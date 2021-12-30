@@ -1,21 +1,18 @@
 import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/page_components.dart';
 import 'package:bilans/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 
 class ReportsPage extends StatefulWidget {
-  const ReportsPage({Key? key}) : super(key: key);
+  final UserModel loggedInUser;
+  const ReportsPage({Key? key, required this.loggedInUser}) : super(key: key);
 
   @override
   _ReportsPageState createState() => _ReportsPageState();
 }
 
 class _ReportsPageState extends State<ReportsPage> {
-  User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
   String periodValue = 'All';
   String typeValue = 'Incomes vs Expenses';
   var chartWidget = const Padding(
@@ -28,14 +25,7 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      rebuildChart();
-    });
+    rebuildChart();
   }
 
   @override
@@ -83,15 +73,15 @@ class _ReportsPageState extends State<ReportsPage> {
     switch (typeValue) {
       case "Incomes vs Expenses":
         series = await ChartComponents.recalculateDataIncomeExpanse(
-            periodValue, loggedInUser);
+            periodValue, widget.loggedInUser);
         break;
       case "Income Categories":
         series = await ChartComponents.recalculateDataIncomeCategories(
-            periodValue, loggedInUser);
+            periodValue, widget.loggedInUser);
         break;
       case "Expense Categories":
         series = await ChartComponents.recalculateDataExpenseCategories(
-            periodValue, loggedInUser);
+            periodValue, widget.loggedInUser);
         break;
     }
     setDataChart(series);

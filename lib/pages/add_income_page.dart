@@ -2,20 +2,18 @@ import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:bilans/utility/numeric_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AddIncomePage extends StatefulWidget {
-  const AddIncomePage({Key? key}) : super(key: key);
+  final UserModel loggedInUser;
+  const AddIncomePage({Key? key, required this.loggedInUser}) : super(key: key);
 
   @override
   _AddIncomePageState createState() => _AddIncomePageState();
 }
 
 class _AddIncomePageState extends State<AddIncomePage> {
-  User? user = FirebaseAuth.instance.currentUser;
-  UserModel loggedInUser = UserModel();
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -27,14 +25,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
   }
 
   @override
@@ -59,7 +49,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
 
     final categoryField = FormFieldComponents.dropdownCategoryListField(
         categories
-            .where("userId", isEqualTo: loggedInUser.uid)
+            .where("userId", isEqualTo: widget.loggedInUser.uid)
             .where("type", isEqualTo: "Income Category")
             .snapshots(),
         selectedCategory,
@@ -121,7 +111,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
           'name': nameController.text,
           'description': descriptionController.text,
           'amount': Numeric.formatPrice(amountController.text),
-          'userId': loggedInUser.uid,
+          'userId': widget.loggedInUser.uid,
           'categoryId': selectedCategory,
           'date': dateControll,
           'id': incomes.doc().id,

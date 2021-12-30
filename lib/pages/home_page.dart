@@ -37,26 +37,36 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final expenseButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ExpensesPage())),
+        () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    ExpensesPage(loggedInUser: loggedInUser))),
         "Expenses");
 
     final incomeButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const IncomesPage())),
+        () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => IncomesPage(loggedInUser: loggedInUser))),
         "Incomes");
 
     final categoryButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const CategoriesPage())),
+        () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    CategoriesPage(loggedInUser: loggedInUser))),
         "Categories");
 
     final tableButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ReportsPage())),
+        () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReportsPage(loggedInUser: loggedInUser))),
         "Reports and Charts");
 
     final logoutButton = Material(
@@ -161,7 +171,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 }
