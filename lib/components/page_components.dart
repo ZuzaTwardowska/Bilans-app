@@ -1,3 +1,4 @@
+import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/expense_model.dart';
 import 'package:bilans/models/income_model.dart';
 import 'package:bilans/models/user_model.dart';
@@ -222,5 +223,52 @@ class PageComponents {
         },
       ),
     );
+  }
+
+  static StreamBuilder<QuerySnapshot> categoriesRecordList(
+      UserModel loggedInUser, String categoryType) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('categories')
+            .where("userId", isEqualTo: loggedInUser.uid)
+            .where("type", isEqualTo: categoryType)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            if (snapshot.data!.docs.isNotEmpty) {
+              return Scrollbar(
+                child: ListView(
+                  children: snapshot.data!.docs.map((doc) {
+                    return Card(
+                      child: ListTile(
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(CategoryModel.fromMap(doc.data()!).name!),
+                            MaterialButton(
+                              onPressed: () {
+                                doc.reference.delete();
+                              },
+                              child: const Icon(
+                                Icons.remove,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              );
+            } else {
+              return const Text("No categories yet :(");
+            }
+          }
+        });
   }
 }

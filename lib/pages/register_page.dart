@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'home_page.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -40,7 +39,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final passwordField = FormFieldComponents.passwordField(
         passwordController, TextInputAction.next);
 
-    final confirmPasswordField = FormFieldComponents.confrimPasswordField(
+    final confirmPasswordField = FormFieldComponents.confirmPasswordField(
         confirmPasswordController,
         passwordController.text,
         TextInputAction.done);

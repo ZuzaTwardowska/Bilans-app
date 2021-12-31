@@ -1,9 +1,8 @@
+import 'package:bilans/components/database_components.dart';
 import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
-import 'package:bilans/utility/numeric_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class AddIncomePage extends StatefulWidget {
   final UserModel loggedInUser;
@@ -31,8 +30,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
   Widget build(BuildContext context) {
     CollectionReference categories =
         FirebaseFirestore.instance.collection('categories');
-    CollectionReference incomes =
-        FirebaseFirestore.instance.collection('incomes');
 
     final nameField = FormFieldComponents.regularTextField(nameController,
         "Income title", true, Icons.category_rounded, TextInputAction.next);
@@ -53,13 +50,30 @@ class _AddIncomePageState extends State<AddIncomePage> {
             .where("type", isEqualTo: "Income Category")
             .snapshots(),
         selectedCategory,
-        setCategory);
+        (String value) => {
+              setState(() {
+                selectedCategory = value;
+              })
+            });
 
-    final dateField =
-        FormFieldComponents.dateField(context, dateControll, setDate);
+    final dateField = FormFieldComponents.dateField(
+        context,
+        dateControll,
+        (DateTime value) => {
+              setState(() {
+                dateControll = value;
+              })
+            });
 
     final addButton = FormFieldComponents.addNewElement(
-        context, incomes, addIncome, "Add Income");
+        context,
+        DatabaseComponents.addIncome,
+        "Add Income",
+        _formKey,
+        widget.loggedInUser,
+        [nameController, descriptionController, amountController],
+        selectedCategory,
+        dateControll);
 
     return Scaffold(
       appBar: AppBar(
@@ -97,40 +111,5 @@ class _AddIncomePageState extends State<AddIncomePage> {
         ),
       ),
     );
-  }
-
-  void addIncome(CollectionReference incomes) async {
-    if (selectedCategory == null ||
-        !_formKey.currentState!.validate() ||
-        dateControll == null) {
-      Fluttertoast.showToast(msg: "Provide all data!");
-      return;
-    }
-    await incomes
-        .add({
-          'name': nameController.text,
-          'description': descriptionController.text,
-          'amount': Numeric.formatPrice(amountController.text),
-          'userId': widget.loggedInUser.uid,
-          'categoryId': selectedCategory,
-          'date': dateControll,
-          'id': incomes.doc().id,
-        })
-        .then((value) => Fluttertoast.showToast(msg: "Income added!"))
-        .catchError(
-            (error) => Fluttertoast.showToast(msg: "Something went wrong..."));
-    Navigator.of(context).pop();
-  }
-
-  void setCategory(String value) {
-    setState(() {
-      selectedCategory = value;
-    });
-  }
-
-  void setDate(DateTime value) {
-    setState(() {
-      dateControll = value;
-    });
   }
 }

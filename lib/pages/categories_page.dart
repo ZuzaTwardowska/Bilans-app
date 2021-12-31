@@ -1,7 +1,5 @@
 import 'package:bilans/components/page_components.dart';
-import 'package:bilans/models/category_model.dart';
 import 'package:bilans/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'add_category_page.dart';
 
@@ -22,9 +20,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference categories =
-        FirebaseFirestore.instance.collection('categories');
-
     final addCategoryButton = PageComponents.redirectButton(
         context,
         () => Navigator.push(
@@ -35,96 +30,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     ))),
         "Add Category");
 
-    final incomeList = StreamBuilder<QuerySnapshot>(
-        stream: categories
-            .where("userId", isEqualTo: widget.loggedInUser.uid)
-            .where("type", isEqualTo: "Income Category")
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            if (snapshot.data!.docs.isNotEmpty) {
-              return Scrollbar(
-                child: ListView(
-                  children: snapshot.data!.docs.map((doc) {
-                    return Card(
-                      child: ListTile(
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(CategoryModel.fromMap(doc.data()!).name!),
-                            MaterialButton(
-                              onPressed: () {
-                                doc.reference.delete();
-                              },
-                              child: const Icon(
-                                Icons.remove,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              );
-            } else {
-              return const Center(
-                child: Text(
-                  "No categories yet :(",
-                  style: TextStyle(fontSize: 16),
-                ),
-              );
-            }
-          }
-        });
+    final incomeList = PageComponents.categoriesRecordList(
+        widget.loggedInUser, "Income Category");
 
-    final expenseList = StreamBuilder<QuerySnapshot>(
-        stream: categories
-            .where("userId", isEqualTo: widget.loggedInUser.uid)
-            .where("type", isEqualTo: "Expense Category")
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            if (snapshot.data!.docs.isNotEmpty) {
-              return Scrollbar(
-                child: ListView(
-                  children: snapshot.data!.docs.map((doc) {
-                    return Card(
-                      child: ListTile(
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(CategoryModel.fromMap(doc.data()!).name!),
-                            MaterialButton(
-                              onPressed: () {
-                                doc.reference.delete();
-                              },
-                              child: const Icon(
-                                Icons.remove,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              );
-            } else {
-              return const Text("No categories yet :(");
-            }
-          }
-        });
+    final expenseList = PageComponents.categoriesRecordList(
+        widget.loggedInUser, "Expense Category");
 
     return Scaffold(
       appBar: AppBar(

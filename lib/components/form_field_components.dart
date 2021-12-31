@@ -1,4 +1,5 @@
 import 'package:bilans/models/category_model.dart';
+import 'package:bilans/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -44,7 +45,7 @@ class FormFieldComponents {
     );
   }
 
-  static TextFormField confrimPasswordField(
+  static TextFormField confirmPasswordField(
       TextEditingController passwordController,
       String passwordValue,
       TextInputAction inputAction) {
@@ -180,8 +181,15 @@ class FormFieldComponents {
     );
   }
 
-  static Material addNewElement(BuildContext context,
-      CollectionReference collection, Function action, String name) {
+  static Material addNewElement(
+      BuildContext context,
+      Function addElementFunction,
+      String name,
+      GlobalKey<FormState> formKey,
+      UserModel loggedInUser,
+      List<TextEditingController> controllers,
+      String? selectedValue,
+      DateTime? selectedDate) {
     return Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
@@ -190,7 +198,8 @@ class FormFieldComponents {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          action(collection);
+          addElementFunction(formKey, context, loggedInUser, controllers,
+              selectedValue, selectedDate);
         },
         child: Text(
           name,
@@ -207,44 +216,45 @@ class FormFieldComponents {
       String? selectedCategory,
       Function action) {
     return StreamBuilder<QuerySnapshot>(
-        stream: dataStream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (snapshot.data!.docs.isNotEmpty) {
-            return Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 4,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      hintText: 'Choose category',
-                    ),
-                    isEmpty: selectedCategory == null,
-                    child: DropdownButton(
-                      value: selectedCategory,
-                      isDense: true,
-                      isExpanded: true,
-                      onChanged: (String? newValue) {
-                        action(newValue!);
-                      },
-                      items: snapshot.data!.docs.map((doc) {
-                        return DropdownMenuItem<String>(
-                          value: CategoryModel.fromMap(doc).id,
-                          child: Text(CategoryModel.fromMap(doc).name!),
-                        );
-                      }).toList(),
-                    ),
+      stream: dataStream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (snapshot.data!.docs.isNotEmpty) {
+          return Row(
+            children: <Widget>[
+              Expanded(
+                flex: 4,
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    hintText: 'Choose category',
+                  ),
+                  isEmpty: selectedCategory == null,
+                  child: DropdownButton(
+                    value: selectedCategory,
+                    isDense: true,
+                    isExpanded: true,
+                    onChanged: (String? newValue) {
+                      action(newValue!);
+                    },
+                    items: snapshot.data!.docs.map((doc) {
+                      return DropdownMenuItem<String>(
+                        value: CategoryModel.fromMap(doc).id,
+                        child: Text(CategoryModel.fromMap(doc).name!),
+                      );
+                    }).toList(),
                   ),
                 ),
-              ],
-            );
-          } else {
-            return const Text("Please add some categories first.");
-          }
-        });
+              ),
+            ],
+          );
+        } else {
+          return const Text("Please add some categories first.");
+        }
+      },
+    );
   }
 }

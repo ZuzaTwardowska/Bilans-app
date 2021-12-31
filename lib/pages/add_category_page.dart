@@ -1,8 +1,8 @@
+import 'package:bilans/components/database_components.dart';
 import 'package:bilans/components/form_field_components.dart';
+import 'package:bilans/components/page_components.dart';
 import 'package:bilans/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class AddCategoryPage extends StatefulWidget {
   final UserModel loggedInUser;
@@ -17,8 +17,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
-  String? selectedType;
-  String? errorMessage;
+  String selectedType = "Income Category";
 
   @override
   void initState() {
@@ -27,9 +26,6 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference categories =
-        FirebaseFirestore.instance.collection('categories');
-
     final nameField = FormFieldComponents.regularTextField(nameController,
         "Category Name", true, Icons.category_rounded, TextInputAction.next);
 
@@ -40,45 +36,20 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         Icons.description_rounded,
         TextInputAction.next);
 
-    final typeField = FormField<String>(
-      builder: (FormFieldState<String> state) {
-        return InputDecorator(
-          decoration: InputDecoration(
-            hintText: "Select category type",
-            errorStyle:
-                const TextStyle(color: Colors.redAccent, fontSize: 12.0),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-          ),
-          isEmpty: selectedType == '',
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: selectedType,
-              isDense: true,
-              onChanged: (String? newValue) {
-                setState(
-                  () {
-                    selectedType = newValue!;
-                    state.didChange(newValue);
-                  },
-                );
-              },
-              items:
-                  ["Income Category", "Expense Category"].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
+    final typeField = PageComponents.dropdownOptions(
+        selectedType,
+        (String value) => {selectedType = value},
+        ["Income Category", "Expense Category"]);
 
     final addButton = FormFieldComponents.addNewElement(
-        context, categories, addCategory, "Add Category");
+        context,
+        DatabaseComponents.addCategory,
+        "Add Category",
+        _formKey,
+        widget.loggedInUser,
+        [nameController, descriptionController],
+        selectedType,
+        null);
 
     return Scaffold(
       appBar: AppBar(
@@ -112,22 +83,5 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         ),
       ),
     );
-  }
-
-  void addCategory(CollectionReference categories) async {
-    if (selectedType == null) return;
-    if (!_formKey.currentState!.validate()) return;
-    await categories
-        .add({
-          'name': nameController.text,
-          'description': descriptionController.text,
-          'userId': widget.loggedInUser.uid,
-          'type': selectedType,
-          'id': categories.doc().id,
-        })
-        .then((value) => Fluttertoast.showToast(msg: "Category added!"))
-        .catchError(
-            (error) => Fluttertoast.showToast(msg: "Something went wrong..."));
-    Navigator.of(context).pop();
   }
 }
