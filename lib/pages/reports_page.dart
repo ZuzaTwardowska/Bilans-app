@@ -31,9 +31,23 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   Widget build(BuildContext context) {
     final periodDropdown = PageComponents.dropdownOptions(
-        periodValue, setPeriod, ['Month', 'Two Months', 'All']);
+        periodValue,
+        (String value) => {
+              setState(() {
+                periodValue = value;
+                rebuildChart();
+              })
+            },
+        ['Month', 'Two Months', 'All']);
 
-    final typeDropdown = PageComponents.dropdownOptions(typeValue, setType,
+    final typeDropdown = PageComponents.dropdownOptions(
+        typeValue,
+        (String value) => {
+              setState(() {
+                typeValue = value;
+                rebuildChart();
+              })
+            },
         ['Incomes vs Expenses', 'Income Categories', 'Expense Categories']);
 
     return Scaffold(
@@ -59,8 +73,8 @@ class _ReportsPageState extends State<ReportsPage> {
               ),
             ),
             chartWidget,
-            periodDropdown,
-            typeDropdown
+            SizedBox(width: 200, child: periodDropdown),
+            SizedBox(width: 200, child: typeDropdown),
           ],
         ),
       ),
@@ -69,7 +83,7 @@ class _ReportsPageState extends State<ReportsPage> {
 
   void rebuildChart() async {
     Map<String, double> series = {};
-    setLoadingComponent();
+    setDataChart(series);
     switch (typeValue) {
       case "Incomes vs Expenses":
         series = await ChartComponents.recalculateDataIncomeExpanse(
@@ -87,40 +101,22 @@ class _ReportsPageState extends State<ReportsPage> {
     setDataChart(series);
   }
 
-  void setLoadingComponent() {
-    setState(() {
-      chartWidget = const Padding(
-        padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    });
-  }
-
   void setDataChart(Map<String, double> series) {
     setState(() {
-      chartWidget = Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: SizedBox(
-          height: 200.0,
-          child: PieChart(dataMap: series),
-        ),
-      );
-    });
-  }
-
-  void setPeriod(String value) {
-    setState(() {
-      periodValue = value;
-      rebuildChart();
-    });
-  }
-
-  void setType(String value) {
-    setState(() {
-      typeValue = value;
-      rebuildChart();
+      chartWidget = series.isNotEmpty
+          ? Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: SizedBox(
+                height: 200.0,
+                child: PieChart(dataMap: series),
+              ),
+            )
+          : const Padding(
+              padding: EdgeInsets.fromLTRB(0, 110, 0, 120),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
     });
   }
 }

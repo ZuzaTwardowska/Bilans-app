@@ -40,6 +40,7 @@ class PageComponents {
         color: Colors.redAccent,
       ),
       elevation: 16,
+      isExpanded: true,
       style: const TextStyle(color: Colors.redAccent),
       underline: Container(
         height: 2,

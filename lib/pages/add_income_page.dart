@@ -1,7 +1,7 @@
+import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/database_components.dart';
 import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AddIncomePage extends StatefulWidget {
@@ -20,6 +20,9 @@ class _AddIncomePageState extends State<AddIncomePage> {
   String? selectedCategory;
   String? errorMessage;
   DateTime? dateControll;
+  Center categoryField = const Center(
+    child: CircularProgressIndicator(),
+  );
 
   @override
   void initState() {
@@ -28,9 +31,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference categories =
-        FirebaseFirestore.instance.collection('categories');
-
     final nameField = FormFieldComponents.regularTextField(nameController,
         "Income title", true, Icons.category_rounded, TextInputAction.next);
 
@@ -43,18 +43,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
 
     final amountField = FormFieldComponents.amountTextField(
         amountController, "Cost", TextInputAction.next);
-
-    final categoryField = FormFieldComponents.dropdownCategoryListField(
-        categories
-            .where("userId", isEqualTo: widget.loggedInUser.uid)
-            .where("type", isEqualTo: "Income Category")
-            .snapshots(),
-        selectedCategory,
-        (String value) => {
-              setState(() {
-                selectedCategory = value;
-              })
-            });
 
     final dateField = FormFieldComponents.dateField(
         context,
@@ -92,7 +80,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
               key: _formKey,
               child: Column(
                 children: <Widget>[
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 40),
                   nameField,
                   const SizedBox(height: 20),
                   descriptionField,
@@ -111,5 +99,24 @@ class _AddIncomePageState extends State<AddIncomePage> {
         ),
       ),
     );
+  }
+
+  void loadCategories() async {
+    Map<String, String> categories = await ChartComponents.readCategories(
+        "Income Category", widget.loggedInUser);
+    setState(() {
+      categoryField = Center(
+        child: FormFieldComponents.dropdownCategoryListField(
+          categories,
+          selectedCategory,
+          (String value) => {
+            setState(() {
+              selectedCategory = value;
+              loadCategories();
+            })
+          },
+        ),
+      );
+    });
   }
 }

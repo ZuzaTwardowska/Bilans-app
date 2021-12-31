@@ -211,50 +211,32 @@ class FormFieldComponents {
     );
   }
 
-  static StreamBuilder dropdownCategoryListField(
-      Stream<QuerySnapshot> dataStream,
+  static DropdownButton<String> dropdownCategoryListField(
+      Map<String, String> categories,
       String? selectedCategory,
       Function action) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: dataStream,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (snapshot.data!.docs.isNotEmpty) {
-          return Row(
-            children: <Widget>[
-              Expanded(
-                flex: 4,
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    hintText: 'Choose category',
-                  ),
-                  isEmpty: selectedCategory == null,
-                  child: DropdownButton(
-                    value: selectedCategory,
-                    isDense: true,
-                    isExpanded: true,
-                    onChanged: (String? newValue) {
-                      action(newValue!);
-                    },
-                    items: snapshot.data!.docs.map((doc) {
-                      return DropdownMenuItem<String>(
-                        value: CategoryModel.fromMap(doc).id,
-                        child: Text(CategoryModel.fromMap(doc).name!),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ],
-          );
-        } else {
-          return const Text("Please add some categories first.");
-        }
+    return DropdownButton<String>(
+      value: selectedCategory,
+      icon: const Icon(
+        Icons.arrow_downward,
+        color: Colors.redAccent,
+      ),
+      elevation: 16,
+      isExpanded: true,
+      style: const TextStyle(color: Colors.redAccent),
+      underline: Container(
+        height: 2,
+        color: Colors.redAccent,
+      ),
+      onChanged: (String? newValue) {
+        action(newValue!);
       },
+      items: categories.keys.map<DropdownMenuItem<String>>((String key) {
+        return DropdownMenuItem<String>(
+          value: key,
+          child: Text(categories[key]!),
+        );
+      }).toList(),
     );
   }
 }

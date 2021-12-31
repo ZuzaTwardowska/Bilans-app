@@ -1,7 +1,7 @@
+import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/database_components.dart';
 import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AddExpensePage extends StatefulWidget {
@@ -21,17 +21,18 @@ class _AddExpensePageState extends State<AddExpensePage> {
   DateTime? dateControll;
   String? selectedCategory;
   String? errorMessage;
+  Center categoryField = const Center(
+    child: CircularProgressIndicator(),
+  );
 
   @override
   void initState() {
     super.initState();
+    loadCategories();
   }
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference categories =
-        FirebaseFirestore.instance.collection('categories');
-
     final nameField = FormFieldComponents.regularTextField(nameController,
         "Expense title", true, Icons.category_rounded, TextInputAction.next);
 
@@ -44,18 +45,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
     final amountField = FormFieldComponents.amountTextField(
         amountController, "Cost", TextInputAction.next);
-
-    final categoryField = FormFieldComponents.dropdownCategoryListField(
-        categories
-            .where("userId", isEqualTo: widget.loggedInUser.uid)
-            .where("type", isEqualTo: "Expense Category")
-            .snapshots(),
-        selectedCategory,
-        (String value) => {
-              setState(() {
-                selectedCategory = value;
-              })
-            });
 
     final dateField = FormFieldComponents.dateField(
         context,
@@ -93,7 +82,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               key: _formKey,
               child: Column(
                 children: <Widget>[
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 40),
                   nameField,
                   const SizedBox(height: 20),
                   descriptionField,
@@ -112,5 +101,24 @@ class _AddExpensePageState extends State<AddExpensePage> {
         ),
       ),
     );
+  }
+
+  void loadCategories() async {
+    Map<String, String> categories = await ChartComponents.readCategories(
+        "Expense Category", widget.loggedInUser);
+    setState(() {
+      categoryField = Center(
+        child: FormFieldComponents.dropdownCategoryListField(
+          categories,
+          selectedCategory,
+          (String value) => {
+            setState(() {
+              selectedCategory = value;
+              loadCategories();
+            })
+          },
+        ),
+      );
+    });
   }
 }
