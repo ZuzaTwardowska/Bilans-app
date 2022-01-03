@@ -8,6 +8,7 @@ import 'expenses_page.dart';
 import 'incomes_page.dart';
 import 'login_page.dart';
 import 'reports_page.dart';
+import 'package:bilans/components/page_animation.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -37,36 +38,30 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final expenseButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    ExpensesPage(loggedInUser: loggedInUser))),
+        () => Navigator.of(context).push(PageAnimations.createRoute(
+            (context, animation, secondaryAnimation) =>
+                ExpensesPage(loggedInUser: loggedInUser))),
         "Expenses");
 
     final incomeButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => IncomesPage(loggedInUser: loggedInUser))),
+        () => Navigator.of(context).push(PageAnimations.createRoute(
+            (context, animation, secondaryAnimation) =>
+                IncomesPage(loggedInUser: loggedInUser))),
         "Incomes");
 
     final categoryButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    CategoriesPage(loggedInUser: loggedInUser))),
+        () => Navigator.of(context).push(PageAnimations.createRoute(
+            (context, animation, secondaryAnimation) =>
+                CategoriesPage(loggedInUser: loggedInUser))),
         "Categories");
 
     final tableButton = PageComponents.redirectButton(
         context,
-        () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ReportsPage(loggedInUser: loggedInUser))),
+        () => Navigator.of(context).push(PageAnimations.createRoute(
+            (context, animation, secondaryAnimation) =>
+                ReportsPage(loggedInUser: loggedInUser))),
         "Reports and Charts");
 
     final logoutButton = Material(
