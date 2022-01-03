@@ -1,6 +1,7 @@
 import 'package:bilans/models/income_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:linkwell/linkwell.dart';
 
 class IncomeModelPage extends StatefulWidget {
   final IncomeModel income;
@@ -126,7 +127,7 @@ class _IncomeModelPageState extends State<IncomeModelPage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Text(
+                          LinkWell(
                             widget.income.description!,
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18),

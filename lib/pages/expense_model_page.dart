@@ -1,6 +1,7 @@
 import 'package:bilans/models/expense_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:linkwell/linkwell.dart';
 
 class ExpenseModelPage extends StatefulWidget {
   final ExpenseModel expense;
@@ -32,113 +33,125 @@ class _ExpenseModelPageState extends State<ExpenseModelPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Expanded(
-          child: Column(
-            children: [
-              const Text(
-                "Expense Panel",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.redAccent,
-                    width: 2.0,
+        child: Column(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  const Text(
+                    "Expense Panel",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Column(
-                        children: const [
-                          Text(
-                            "Name:",
-                            style: TextStyle(fontSize: 18),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Column(
+                            children: const [
+                              Text(
+                                "Name:",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Category:",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Date:",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Amount:",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Description:",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            "Category:",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            "Date:",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            "Amount:",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            "Description:",
-                            style: TextStyle(fontSize: 18),
+                          Flexible(
+                            child: Column(
+                              children: [
+                                Text(
+                                  widget.expense.name!,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  widget.category,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  DateFormat("dd-MM-yyyy")
+                                      .format(widget.expense.date!),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  widget.expense.amount!,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                LinkWell(
+                                  widget.expense.description!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      Column(
-                        children: [
-                          Text(
-                            widget.expense.name!,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            widget.category,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            DateFormat("dd-MM-yyyy")
-                                .format(widget.expense.date!),
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            widget.expense.amount!,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            widget.expense.description!,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

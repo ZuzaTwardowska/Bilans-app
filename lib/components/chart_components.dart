@@ -60,6 +60,10 @@ class ChartComponents {
     }
   }
 
+  static DateTime addWeekToDate(DateTime date) {
+    return date.add(const Duration(days: 7));
+  }
+
   static Future<Map<String, double>> recalculateDataIncomeCategories(
       String period, UserModel loggedInUser) async {
     DateTime dateBorder = getDateBorder(period);
@@ -118,5 +122,49 @@ class ChartComponents {
         .where("userId", isEqualTo: loggedInUser.uid)
         .where("date", isGreaterThanOrEqualTo: dateBorder)
         .get();
+  }
+
+  static Future<Map<DateTime, double>> getIncomeDataForLineChart(
+      DateTime date, UserModel loggedInUser) async {
+    QuerySnapshot<Map<String, dynamic>> records = await FirebaseFirestore
+        .instance
+        .collection("incomes")
+        .where("userId", isEqualTo: loggedInUser.uid)
+        .where("date", isGreaterThanOrEqualTo: date)
+        .where("date", isLessThanOrEqualTo: addWeekToDate(date))
+        .get();
+    Map<DateTime, double> res = {};
+    for (var item in records.docs) {
+      DateTime itemDate = DateTime(
+          IncomeModel.fromMap(item).date!.year,
+          IncomeModel.fromMap(item).date!.month,
+          IncomeModel.fromMap(item).date!.day);
+      res.putIfAbsent(itemDate, () => 0);
+      double value = res[itemDate]!;
+      res[itemDate] = value + double.parse(IncomeModel.fromMap(item).amount!);
+    }
+    return res;
+  }
+
+  static Future<Map<DateTime, double>> getExpenseDataForLineChart(
+      DateTime date, UserModel loggedInUser) async {
+    QuerySnapshot<Map<String, dynamic>> records = await FirebaseFirestore
+        .instance
+        .collection("expenses")
+        .where("userId", isEqualTo: loggedInUser.uid)
+        .where("date", isGreaterThanOrEqualTo: date)
+        .where("date", isLessThanOrEqualTo: addWeekToDate(date))
+        .get();
+    Map<DateTime, double> res = {};
+    for (var item in records.docs) {
+      DateTime itemDate = DateTime(
+          ExpenseModel.fromMap(item).date!.year,
+          ExpenseModel.fromMap(item).date!.month,
+          ExpenseModel.fromMap(item).date!.day);
+      res.putIfAbsent(itemDate, () => 0);
+      double value = res[itemDate]!;
+      res[itemDate] = value + double.parse(ExpenseModel.fromMap(item).amount!);
+    }
+    return res;
   }
 }

@@ -4,6 +4,8 @@ import 'package:bilans/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 
+import 'line_chart_page.dart';
+
 class ReportsPage extends StatefulWidget {
   final UserModel loggedInUser;
   const ReportsPage({Key? key, required this.loggedInUser}) : super(key: key);
@@ -75,6 +77,18 @@ class _ReportsPageState extends State<ReportsPage> {
             chartWidget,
             SizedBox(width: 200, child: periodDropdown),
             SizedBox(width: 200, child: typeDropdown),
+            const SizedBox(
+              height: 40,
+            ),
+            PageComponents.redirectButton(
+                context,
+                () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LineChartPage(
+                              loggedInUser: widget.loggedInUser,
+                            ))),
+                "Line Charts"),
           ],
         ),
       ),
