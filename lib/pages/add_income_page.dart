@@ -18,7 +18,6 @@ class _AddIncomePageState extends State<AddIncomePage> {
   final descriptionController = TextEditingController();
   final amountController = TextEditingController();
   String? selectedCategory;
-  String? errorMessage;
   DateTime? dateControll;
   Center categoryField = const Center(
     child: CircularProgressIndicator(),
@@ -27,6 +26,7 @@ class _AddIncomePageState extends State<AddIncomePage> {
   @override
   void initState() {
     super.initState();
+    loadCategories();
   }
 
   @override
@@ -61,7 +61,8 @@ class _AddIncomePageState extends State<AddIncomePage> {
         widget.loggedInUser,
         [nameController, descriptionController, amountController],
         selectedCategory,
-        dateControll);
+        dateControll,
+        null);
 
     return Scaffold(
       appBar: AppBar(
@@ -72,32 +73,33 @@ class _AddIncomePageState extends State<AddIncomePage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(30),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(height: 40),
-                  nameField,
-                  const SizedBox(height: 20),
-                  descriptionField,
-                  const SizedBox(height: 20),
-                  categoryField,
-                  const SizedBox(height: 20),
-                  amountField,
-                  const SizedBox(height: 20),
-                  dateField,
-                  const SizedBox(height: 40),
-                  addButton,
-                ],
+      body: Builder(builder: (context) {
+        return Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    nameField,
+                    const SizedBox(height: 20),
+                    descriptionField,
+                    const SizedBox(height: 20),
+                    categoryField,
+                    const SizedBox(height: 20),
+                    amountField,
+                    const SizedBox(height: 20),
+                    dateField,
+                    const SizedBox(height: 20),
+                    addButton,
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 

@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:bilans/components/chart_components.dart';
 import 'package:bilans/components/database_components.dart';
 import 'package:bilans/components/form_field_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddExpensePage extends StatefulWidget {
   final UserModel loggedInUser;
@@ -20,7 +22,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
   final amountController = TextEditingController();
   DateTime? dateControll;
   String? selectedCategory;
-  String? errorMessage;
+  File? imageFile;
+  final ImagePicker imagePicker = ImagePicker();
   Center categoryField = const Center(
     child: CircularProgressIndicator(),
   );
@@ -63,7 +66,40 @@ class _AddExpensePageState extends State<AddExpensePage> {
         widget.loggedInUser,
         [nameController, descriptionController, amountController],
         selectedCategory,
-        dateControll);
+        dateControll,
+        imageFile);
+
+    final addPhotoField = Padding(
+      padding: const EdgeInsets.all(0),
+      child: Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.redAccent,
+        child: MaterialButton(
+          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+          onPressed: () {
+            showModalBottomSheet(context: context, builder: bottomPhotoPanel);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.add_a_photo_rounded, color: Colors.white),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                "Add Photo",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -82,7 +118,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               key: _formKey,
               child: Column(
                 children: <Widget>[
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   nameField,
                   const SizedBox(height: 20),
                   descriptionField,
@@ -92,7 +128,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   amountField,
                   const SizedBox(height: 20),
                   dateField,
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
+                  addPhotoField,
+                  const SizedBox(height: 20),
                   addButton,
                 ],
               ),
@@ -119,6 +157,70 @@ class _AddExpensePageState extends State<AddExpensePage> {
           },
         ),
       );
+    });
+  }
+
+  Widget bottomPhotoPanel(BuildContext context) {
+    return Container(
+      height: 120,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        children: [
+          const Text(
+            "Add Photo",
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              MaterialButton(
+                  onPressed: () {
+                    choosePhoto(ImageSource.camera);
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.camera_alt_rounded),
+                      SizedBox(width: 10),
+                      Text(
+                        "Camera",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  )),
+              MaterialButton(
+                  onPressed: () {
+                    choosePhoto(ImageSource.gallery);
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.image),
+                      SizedBox(width: 10),
+                      Text(
+                        "Gallery",
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  )),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  void choosePhoto(ImageSource source) async {
+    final pickedFile = await imagePicker.getImage(source: source);
+    if (pickedFile == null) return;
+    setState(() {
+      imageFile = File(pickedFile.path);
     });
   }
 }

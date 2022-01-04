@@ -1,6 +1,5 @@
-import 'package:bilans/models/category_model.dart';
+import 'dart:io';
 import 'package:bilans/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'form_validation.dart';
@@ -193,7 +192,8 @@ class FormFieldComponents {
       UserModel loggedInUser,
       List<TextEditingController> controllers,
       String? selectedValue,
-      DateTime? selectedDate) {
+      DateTime? selectedDate,
+      File? file) {
     return Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(30),
@@ -203,7 +203,7 @@ class FormFieldComponents {
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
           addElementFunction(formKey, context, loggedInUser, controllers,
-              selectedValue, selectedDate);
+              selectedValue, selectedDate, file);
         },
         child: Text(
           name,

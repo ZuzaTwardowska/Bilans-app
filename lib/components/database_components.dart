@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'package:bilans/components/firebase_storage_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:bilans/utility/numeric_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -11,7 +14,8 @@ class DatabaseComponents {
       UserModel loggedInUser,
       List<TextEditingController> controllers,
       String? selectedValue,
-      DateTime? selectedDate) async {
+      DateTime? selectedDate,
+      File? file) async {
     if (selectedValue == null || !formKey.currentState!.validate()) return;
     await FirebaseFirestore.instance
         .collection('categories')
@@ -34,13 +38,15 @@ class DatabaseComponents {
       UserModel loggedInUser,
       List<TextEditingController> controllers,
       String? selectedValue,
-      DateTime? selectedDate) async {
+      DateTime? selectedDate,
+      File? file) async {
     if (selectedValue == null ||
         !formKey.currentState!.validate() ||
         selectedDate == null) {
       Fluttertoast.showToast(msg: "Provide all data!");
       return;
     }
+    String id = FirebaseFirestore.instance.collection('expenses').doc().id;
     await FirebaseFirestore.instance
         .collection('expenses')
         .add({
@@ -50,9 +56,16 @@ class DatabaseComponents {
           'userId': loggedInUser.uid,
           'categoryId': selectedValue,
           'date': selectedDate,
-          'id': FirebaseFirestore.instance.collection('expenses').doc().id,
+          'id': id,
         })
-        .then((value) => Fluttertoast.showToast(msg: "Expense added!"))
+        .then((value) => {
+              if (file != null)
+                {
+                  FirebaseStorageComponents.uploadImageToFirebase(
+                      context, file, id)
+                },
+              Fluttertoast.showToast(msg: "Expense added!")
+            })
         .catchError(
             (error) => Fluttertoast.showToast(msg: "Something went wrong..."));
     Navigator.of(context).pop();
@@ -64,7 +77,8 @@ class DatabaseComponents {
       UserModel loggedInUser,
       List<TextEditingController> controllers,
       String? selectedValue,
-      DateTime? selectedDate) async {
+      DateTime? selectedDate,
+      File? file) async {
     if (selectedValue == null ||
         !formKey.currentState!.validate() ||
         selectedDate == null) {

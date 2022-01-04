@@ -49,6 +49,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
         widget.loggedInUser,
         [nameController, descriptionController],
         selectedType,
+        null,
         null);
 
     return Scaffold(
