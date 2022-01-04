@@ -156,8 +156,12 @@ class FormFieldComponents {
     );
   }
 
-  static Material formSubmitButton(BuildContext context, String name,
-      List<TextEditingController> controllers, Function action) {
+  static Material formSubmitButton(
+      BuildContext context,
+      String name,
+      List<TextEditingController> controllers,
+      Function action,
+      GlobalKey<FormState> formKey) {
     return Material(
       elevation: 5,
       borderRadius: BorderRadius.circular(10),
@@ -166,7 +170,7 @@ class FormFieldComponents {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: () {
-          action(controllers);
+          action(controllers, formKey, context);
         },
         child: Text(
           name,

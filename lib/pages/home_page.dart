@@ -8,7 +8,7 @@ import 'expenses_page.dart';
 import 'incomes_page.dart';
 import 'login_page.dart';
 import 'reports_page.dart';
-import 'package:bilans/components/page_animation.dart';
+import 'package:bilans/components/page_animations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

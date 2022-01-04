@@ -1,10 +1,6 @@
 import 'package:bilans/components/form_field_components.dart';
-import 'package:bilans/models/user_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bilans/components/login_components.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'home_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -21,9 +17,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-
-  final _auth = FirebaseAuth.instance;
-  String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +37,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         passwordController.text,
         TextInputAction.done);
 
-    final signUpButton = FormFieldComponents.formSubmitButton(context,
-        "Sign up", [emailController, passwordController].toList(), register);
+    final signUpButton = FormFieldComponents.formSubmitButton(
+        context,
+        "Sign up",
+        [emailController, passwordController, nameController, surnameController]
+            .toList(),
+        LoginComponents.register,
+        _formKey);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -90,65 +88,5 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
       ),
     );
-  }
-
-  void register(List<TextEditingController> controllers) async {
-    String email = controllers[0].text;
-    String password = controllers[1].text;
-    if (_formKey.currentState!.validate()) {
-      try {
-        await _auth
-            .createUserWithEmailAndPassword(email: email, password: password)
-            .then((value) => {postDetailsToFirestore()})
-            .catchError((e) {
-          Fluttertoast.showToast(msg: e!.message);
-        });
-      } on FirebaseAuthException catch (error) {
-        switch (error.code) {
-          case "invalid-email":
-            errorMessage = "Your email address appears to be malformed.";
-            break;
-          case "wrong-password":
-            errorMessage = "Your password is wrong.";
-            break;
-          case "user-not-found":
-            errorMessage = "User with this email doesn't exist.";
-            break;
-          case "user-disabled":
-            errorMessage = "User with this email has been disabled.";
-            break;
-          case "too-many-requests":
-            errorMessage = "Too many requests";
-            break;
-          case "operation-not-allowed":
-            errorMessage = "Signing in with Email and Password is not enabled.";
-            break;
-          default:
-            errorMessage = "An undefined Error happened.";
-        }
-        Fluttertoast.showToast(msg: errorMessage!);
-      }
-    }
-  }
-
-  postDetailsToFirestore() async {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = _auth.currentUser;
-
-    UserModel userModel = UserModel();
-
-    userModel.email = user!.email;
-    userModel.uid = user.uid;
-    userModel.name = nameController.text;
-    userModel.surname = surnameController.text;
-
-    await firebaseFirestore
-        .collection("users")
-        .doc(user.uid)
-        .set(userModel.toMap());
-    Fluttertoast.showToast(msg: "Account created successfully :) ");
-
-    Navigator.pushAndRemoveUntil((context),
-        MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
   }
 }
