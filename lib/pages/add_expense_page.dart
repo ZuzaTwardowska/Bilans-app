@@ -23,6 +23,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   DateTime? dateControll;
   String? selectedCategory;
   File? imageFile;
+  Icon photoIcon = const Icon(Icons.add_a_photo_rounded, color: Colors.white);
   final ImagePicker imagePicker = ImagePicker();
   Center categoryField = const Center(
     child: CircularProgressIndicator(),
@@ -73,21 +74,20 @@ class _AddExpensePageState extends State<AddExpensePage> {
       padding: const EdgeInsets.all(0),
       child: Material(
         elevation: 5,
-        borderRadius: BorderRadius.circular(30),
-        color: Colors.redAccent,
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.black38,
         child: MaterialButton(
-          padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
           onPressed: () {
             showModalBottomSheet(context: context, builder: bottomPhotoPanel);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.add_a_photo_rounded, color: Colors.white),
-              SizedBox(
+            children: [
+              photoIcon,
+              const SizedBox(
                 width: 20,
               ),
-              Text(
+              const Text(
                 "Add Photo",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -194,21 +194,22 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     ],
                   )),
               MaterialButton(
-                  onPressed: () {
-                    choosePhoto(ImageSource.gallery);
-                  },
-                  child: Row(
-                    children: const [
-                      Icon(Icons.image),
-                      SizedBox(width: 10),
-                      Text(
-                        "Gallery",
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
+                onPressed: () {
+                  choosePhoto(ImageSource.gallery);
+                },
+                child: Row(
+                  children: const [
+                    Icon(Icons.image),
+                    SizedBox(width: 10),
+                    Text(
+                      "Gallery",
+                      style: TextStyle(
+                        fontSize: 16,
                       ),
-                    ],
-                  )),
+                    ),
+                  ],
+                ),
+              ),
             ],
           )
         ],
@@ -218,9 +219,11 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
   void choosePhoto(ImageSource source) async {
     final pickedFile = await imagePicker.getImage(source: source);
+    Navigator.pop(context);
     if (pickedFile == null) return;
     setState(() {
       imageFile = File(pickedFile.path);
+      photoIcon = const Icon(Icons.done, color: Colors.white);
     });
   }
 }

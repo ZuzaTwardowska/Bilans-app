@@ -10,4 +10,18 @@ class FirebaseStorageComponents {
         .child('expensePhotos/$fileName')
         .putFile(file);
   }
+
+  static Future<Image?> getImage(BuildContext context, String image) async {
+    Image? m;
+    var url =
+        await FirebaseStorage.instance.ref().child(image).getDownloadURL();
+    print(url);
+    if (url == null) return null;
+    m = Image.network(
+      url.toString(),
+      fit: BoxFit.scaleDown,
+    );
+
+    return m;
+  }
 }

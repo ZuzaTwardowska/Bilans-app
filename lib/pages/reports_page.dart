@@ -3,7 +3,6 @@ import 'package:bilans/components/page_components.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
-
 import 'line_chart_page.dart';
 
 class ReportsPage extends StatefulWidget {
