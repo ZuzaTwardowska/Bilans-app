@@ -3,7 +3,7 @@ import 'package:bilans/models/expense_model.dart';
 import 'package:bilans/models/income_model.dart';
 import 'package:bilans/models/user_model.dart';
 import 'package:bilans/pages/expense_model_page.dart';
-import 'package:bilans/pages/income_model.page.dart';
+import 'package:bilans/pages/income_model_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
