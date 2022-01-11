@@ -20,6 +20,24 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedInUser = UserModel();
+  Padding userInfo = Padding(
+    padding: const EdgeInsets.all(12.0),
+    child: Row(
+      children: <Widget>[
+        Column(
+          children: const [
+            Text(
+              "Logged as:",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        const Expanded(
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ],
+    ),
+  );
 
   @override
   void initState() {
@@ -29,8 +47,10 @@ class _HomePageState extends State<HomePage> {
         .doc(user!.uid)
         .get()
         .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
+      setState(() {
+        loggedInUser = UserModel.fromMap(value.data());
+        userInfo = setUserInfo();
+      });
     });
   }
 
@@ -83,42 +103,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    final userInfo = Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Row(
-        children: <Widget>[
-          Column(
-            children: const [
-              Text(
-                "Logged as:",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Column(children: [
-              Text(
-                "${loggedInUser.name} ${loggedInUser.surname}",
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.right,
-              ),
-              Text(
-                "${loggedInUser.email}",
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.right,
-              ),
-            ]),
-          ),
-        ],
-      ),
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Bilans"),
@@ -168,5 +152,43 @@ class _HomePageState extends State<HomePage> {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginPage()));
+  }
+
+  Padding setUserInfo() {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Row(
+        children: <Widget>[
+          Column(
+            children: const [
+              Text(
+                "Logged as:",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Column(children: [
+              Text(
+                "${loggedInUser.name} ${loggedInUser.surname}",
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.right,
+              ),
+              Text(
+                "${loggedInUser.email}",
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ]),
+          ),
+        ],
+      ),
+    );
   }
 }

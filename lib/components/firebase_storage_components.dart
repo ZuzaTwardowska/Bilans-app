@@ -15,7 +15,6 @@ class FirebaseStorageComponents {
     Image? m;
     var url =
         await FirebaseStorage.instance.ref().child(image).getDownloadURL();
-    print(url);
     if (url == null) return null;
     m = Image.network(
       url.toString(),
