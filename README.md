@@ -10,3 +10,5 @@ In the application user can create an account and add incomes, expenses, income 
 ## Technologies
 - Flutter
 - Firebase
+- Firestore
+- Dart
